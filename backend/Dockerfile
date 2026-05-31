@@ -17,7 +17,7 @@ COPY Data/ ./Data/
 
 # Set environment variables
 ENV PORT=8000
-ENV CSV_PATH=/app/Data/NIFTY\ 50_minute.csv
+ENV CSV_PATH="/app/Data/NIFTY 50_minute.csv"
 ENV PYTHONPATH=/app
 
 EXPOSE $PORT

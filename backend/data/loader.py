@@ -43,12 +43,22 @@ def load_minute_data(csv_path: str) -> pd.DataFrame:
     Returns a DataFrame with a 'datetime' column (timezone-naive, IST) and
     standard OHLCV columns.  Only market-hours rows are kept.
     """
-    df = pd.read_csv(csv_path, parse_dates=["date"])
+    # Optimized CSV loading with predefined dtypes to save memory and CPU
+    df = pd.read_csv(
+        csv_path,
+        usecols=["date", "open", "high", "low", "close", "volume"],
+        dtype={
+            "open": "float32",
+            "high": "float32",
+            "low": "float32",
+            "close": "float32",
+            "volume": "float32"
+        }
+    )
     df = df.rename(columns={"date": "datetime"})
 
-    # Ensure numeric types
-    for col in ["open", "high", "low", "close", "volume"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+    # Speed up datetime parsing significantly by specifying the exact format
+    df["datetime"] = pd.to_datetime(df["datetime"], format="%Y-%m-%d %H:%M:%S", errors="coerce")
 
     df = df.dropna(subset=["datetime", "open", "high", "low", "close"])
     df = df.sort_values("datetime").reset_index(drop=True)
