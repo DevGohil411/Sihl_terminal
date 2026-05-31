@@ -1,0 +1,20 @@
+# Environments
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# Node
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# System
+.DS_Store
+Thumbs.db
