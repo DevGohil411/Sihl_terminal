@@ -9,8 +9,8 @@ const nextConfig = {
 
   // Environment variables available at build time
   env: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000',
-    NEXT_PUBLIC_WS_BASE_URL: process.env.NEXT_PUBLIC_WS_BASE_URL || 'ws://127.0.0.1:8000',
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://region-finite-jill-motors.trycloudflare.com',
+    NEXT_PUBLIC_WS_BASE_URL: process.env.NEXT_PUBLIC_WS_BASE_URL || 'wss://region-finite-jill-motors.trycloudflare.com',
   },
 
   // CORS headers for API routes (if you add any serverless functions later)
