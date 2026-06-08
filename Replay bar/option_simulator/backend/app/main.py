@@ -40,24 +40,39 @@ app = FastAPI(
 )
 
 # ─── CORS CONFIGURATION ────────────────────────────────────────────────────────
+# Build origin list from env + defaults
 _default_origins = (
     "http://localhost:5173,http://127.0.0.1:5173,"
     "http://localhost:3000,http://127.0.0.1:3000,"
     "http://localhost:3001,http://127.0.0.1:3001,"
-    "http://localhost:3002,http://127.0.0.1:3002"
+    "http://localhost:3002,http://127.0.0.1:3002,"
+    "https://sihl-terminal12.vercel.app"
 )
-_cors_origins = os.getenv("CORS_ORIGINS", _default_origins).split(",")
+_cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", _default_origins).split(",") if o.strip()]
 # Always ensure Vercel production domain is allowed
 _vercel_domain = os.getenv("VERCEL_DOMAIN", "")
 if _vercel_domain and _vercel_domain not in _cors_origins:
     _cors_origins.append(_vercel_domain)
-# Allow all origins in beta (remove for production hardening)
+# Beta mode: append wildcard-like patterns explicitly (NOT "*" with credentials)
 _allow_all = os.getenv("CORS_ALLOW_ALL", "false").lower() == "true"
+if _allow_all:
+    # When allowing all, we must NOT use allow_credentials=True
+    # So we list common origins explicitly instead of wildcard
+    _extra = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://localhost:3000",
+        "https://127.0.0.1:3000",
+        "https://sihl-terminal12.vercel.app",
+    ]
+    for o in _extra:
+        if o not in _cors_origins:
+            _cors_origins.append(o)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if _allow_all else _cors_origins,
-    allow_credentials=False if _allow_all else True,
+    allow_origins=_cors_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
