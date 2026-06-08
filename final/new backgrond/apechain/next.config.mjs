@@ -9,8 +9,8 @@ const nextConfig = {
 
   // Environment variables available at build time
   env: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://disposition-split-lesson-holmes.trycloudflare.com',
-    NEXT_PUBLIC_WS_BASE_URL: process.env.NEXT_PUBLIC_WS_BASE_URL || 'wss://disposition-split-lesson-holmes.trycloudflare.com',
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://allen-sheer-exhibits-coordination.trycloudflare.com',
+    NEXT_PUBLIC_WS_BASE_URL: process.env.NEXT_PUBLIC_WS_BASE_URL || 'wss://allen-sheer-exhibits-coordination.trycloudflare.com',
   },
 
   // CORS headers for API routes (if you add any serverless functions later)
