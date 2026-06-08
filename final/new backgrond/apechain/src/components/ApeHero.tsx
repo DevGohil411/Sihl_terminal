@@ -22,7 +22,7 @@ const dapps = [
     titleLines: ["SYSTEM", "API"],
     tags: "DATA · INTEGRATION",
     desc: "Low-latency API endpoints engineered for high-frequency and statistical arbitrage workloads.",
-    video: "/videos/v2.mp4",
+    video: "/videos/v_api.mp4",
     color: "#7A68A8",      // Desaturated violet slate
     bgColor: "#0A0810",
     shiftLeft: true
