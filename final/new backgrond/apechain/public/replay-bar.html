@@ -1418,7 +1418,7 @@ async function preload(tf, start, end) {
 
   txt('Loading ' + tf + ' candles…');
   try {
-    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://region-finite-jill-motors.trycloudflare.com';
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://disposition-split-lesson-holmes.trycloudflare.com';
     const dateQ = [];
     if (start) dateQ.push(`start=${start}`);
     if (end) dateQ.push(`end=${end}`);
@@ -1464,7 +1464,7 @@ function buildAllCaches() {
 
 async function loadRegistry() {
   try {
-    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://region-finite-jill-motors.trycloudflare.com';
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://disposition-split-lesson-holmes.trycloudflare.com';
     IndicatorStore.registry = await (await fetch(apiUrl + '/api/indicators/list')).json();
     buildIndUI();
   } catch(e) { console.error('Registry load failed:', e); }
@@ -1535,7 +1535,7 @@ async function addInd(name) {
 
 async function computeFull(ind) {
   try {
-    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://region-finite-jill-motors.trycloudflare.com';
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://disposition-split-lesson-holmes.trycloudflare.com';
     const body = { indicator:ind.name, settings:ind.settings, tf:currentTF };
     if (_replayRange.start) body.start = _replayRange.start;
     if (_replayRange.end)   body.end = _replayRange.end;

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 // The Replay Bar backend URL — update this if deployed elsewhere
-const REPLAY_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://region-finite-jill-motors.trycloudflare.com';
+const REPLAY_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://disposition-split-lesson-holmes.trycloudflare.com';
 
 export default function BuildPage() {
   const [mounted, setMounted] = useState(false);
