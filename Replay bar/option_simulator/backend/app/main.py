@@ -46,7 +46,8 @@ _default_origins = (
     "http://localhost:3000,http://127.0.0.1:3000,"
     "http://localhost:3001,http://127.0.0.1:3001,"
     "http://localhost:3002,http://127.0.0.1:3002,"
-    "https://sihl-terminal12.vercel.app"
+    "https://sihl-terminal12.vercel.app,"
+    "https://sihl-terminal12-7rkyj33xj-dev-gohils-projects.vercel.app"
 )
 _cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", _default_origins).split(",") if o.strip()]
 # Always ensure Vercel production domain is allowed
@@ -64,6 +65,7 @@ if _allow_all:
         "https://localhost:3000",
         "https://127.0.0.1:3000",
         "https://sihl-terminal12.vercel.app",
+        "https://sihl-terminal12-7rkyj33xj-dev-gohils-projects.vercel.app",
     ]
     for o in _extra:
         if o not in _cors_origins:
