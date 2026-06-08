@@ -1,0 +1,31 @@
+# Environment variables (contains sensitive config)
+.env
+
+# DuckDB databases (10GB+ — NEVER commit)
+*.duckdb
+*.duckdb.wal
+
+# Data directory
+data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

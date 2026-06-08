@@ -1,0 +1,36 @@
+# Core web framework
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# Data processing — MUST be this version or higher for LazyFrame scan_csv
+polars==0.20.26
+
+# DuckDB embedded analytical database
+duckdb>=0.10.0
+
+# ClickHouse driver
+clickhouse-driver==0.2.7
+
+# Scientific computing (Greeks, IV solver)
+numpy==1.26.4
+scipy==1.13.0
+
+# Terminal UI for ETL progress
+rich==13.7.1
+
+# Async HTTP client (for future data fetching extensions)
+
+# Database ORM for PostgreSQL session state
+
+# Type validation
+pydantic==2.7.1
+
+# Date utilities
+python-dateutil==2.9.0
+
+# Optional: Numba JIT compilation for extreme performance (install separately)
+# numba==0.59.1
+
+# Testing
+pytest==8.2.0
+pytest-asyncio==0.23.6

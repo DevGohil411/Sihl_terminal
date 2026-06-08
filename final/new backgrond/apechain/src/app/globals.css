@@ -1,0 +1,299 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIHL — PREMIUM INSTITUTIONAL DARK SYSTEM
+   Warm Ivory · Soft Gold · Muted Teal · Deep Emerald · Ocean Blue
+   Premium · Research-grade · Atmospheric · Expensive
+═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Foundation ── */
+  --bg-page:             #080a0d;
+  --bg-deep:             #050608;
+  --bg-surface:          rgba(14, 17, 23, 0.92);
+  --bg-glass:            rgba(255, 255, 255, 0.045);
+  --bg-glass-panel:      rgba(255, 255, 255, 0.028);
+  --bg-glass-hover:      rgba(255, 255, 255, 0.075);
+  --bg-glass-active:     rgba(255, 255, 255, 0.06);
+  --bg-navbar:           rgba(8, 10, 13, 0.88);
+
+  /* ── Borders ── */
+  --border-default:      rgba(255, 255, 255, 0.07);
+  --border-glass:        rgba(255, 255, 255, 0.07);
+  --border-glass-hover:  rgba(255, 255, 255, 0.14);
+  --border-glass-active: rgba(255, 255, 255, 0.22);
+  --border-gold:         rgba(194, 160, 96, 0.30);
+
+  /* ── Text ── */
+  --text-primary:    #EEE9DF;   /* Warm Ivory — not pure white */
+  --text-secondary:  #B8B2A7;   /* Aged parchment */
+  --text-muted:      #7A7670;   /* Stone */
+  --text-disabled:   #4A4845;
+  --nav-inactive:    #8A8278;   /* Warm grey navigation */
+
+  /* ── Premium Accent Palette ── */
+  --accent-gold:       #C2A060;   /* Soft matte gold */
+  --accent-gold-light: #D4B882;   /* Highlight gold */
+  --accent-teal:       #5E9E8E;   /* Muted institutional teal */
+  --accent-ocean:      #4A7FA8;   /* Deep ocean blue */
+  --accent-slate:      #6B7F8E;   /* Desaturated slate */
+  --accent-primary:    #5E9E8E;   /* Primary = muted teal */
+
+  /* ── Semantic ── */
+  --positive:  #4E9E72;   /* Deep emerald — NOT neon green */
+  --negative:  #B85C58;   /* Muted crimson */
+  --warning:   #C49A4A;   /* Amber */
+
+  /* ── Glass & Depth ── */
+  --glass-blur:        blur(20px);
+  --glass-blur-heavy:  blur(32px);
+
+  --shadow-card:          0 4px 24px rgba(0, 0, 0, 0.45);
+  --shadow-glass:         0 8px 32px rgba(0, 0, 0, 0.40);
+  --shadow-glass-elevated:0 16px 56px rgba(0, 0, 0, 0.55);
+  --shadow-modal:         0 24px 80px rgba(0, 0, 0, 0.65);
+  --shadow-gold:          0 0 40px rgba(194, 160, 96, 0.12);
+
+  /* ── Typography ── */
+  --f-display: "Playfair Display", Georgia, serif;
+  --f-body:    "Inter", system-ui, sans-serif;
+  --f-mono:    "JetBrains Mono", "IBM Plex Mono", monospace;
+}
+
+/* ── Resets ─────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  background: var(--bg-page);
+  font-size: 16px;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* ── Scrollbar ──────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(194, 160, 96, 0.18); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(194, 160, 96, 0.32); }
+
+/* ── Selection ──────────────── */
+::selection { background: rgba(194, 160, 96, 0.18); color: var(--text-primary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLASS CARD SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  box-shadow: var(--shadow-glass);
+  transition: border-color 0.30s ease, box-shadow 0.30s ease, transform 0.30s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--border-glass-hover);
+  box-shadow: var(--shadow-glass-elevated);
+  transform: translateY(-2px);
+}
+
+.glass-panel {
+  background: var(--bg-glass-panel);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-hover:hover {
+  background: var(--bg-glass-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY SYSTEM — Refined Hierarchy
+═══════════════════════════════════════════════════════════════════ */
+
+.font-display { font-family: var(--f-display); }
+.font-mono    { font-family: var(--f-mono); }
+
+.t-kicker {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  opacity: 0.85;
+}
+
+.t-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.t-metric {
+  font-family: var(--f-mono);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.t-display {
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.t-heading {
+  font-family: var(--f-body);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BADGE / STATUS
+═══════════════════════════════════════════════════════════════════ */
+
+.badge {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 3px;
+  border: 1px solid;
+  display: inline-block;
+}
+
+/* Hero card tag badge */
+.badge-glow {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLE STYLES
+═══════════════════════════════════════════════════════════════════ */
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 18px;
+  background: var(--bg-glass-panel);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-glass);
+  text-align: left;
+}
+.data-table td {
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+.data-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.015);
+}
+.data-table tr:hover td {
+  background: var(--bg-glass-hover);
+}
+.data-table .mono  { font-family: var(--f-mono); font-size: 13px; }
+.data-table .profit { color: var(--positive); }
+.data-table .loss   { color: var(--negative); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════════════════ */
+
+.btn-primary {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 11px 28px;
+  border-radius: 4px;
+  background: var(--accent-gold);
+  color: #0B0C10;
+  border: 1px solid var(--accent-gold);
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  background: var(--accent-gold-light);
+  border-color: var(--accent-gold-light);
+  box-shadow: 0 0 32px rgba(194, 160, 96, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-glass);
+  transition: all 0.20s ease;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+  border-color: var(--border-glass-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITY — GOLD DIVIDER LINE
+═══════════════════════════════════════════════════════════════════ */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  opacity: 0.35;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   REVEAL MOTION
+═══════════════════════════════════════════════════════════════════ */
+.reveal-ready { opacity: 1; transform: none; }

@@ -1,0 +1,388 @@
+/* OrbitImages.css — Premium Institutional Cinematic Styling */
+
+/* ─── Base Orbit Containers ─── */
+.orbit-container {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: visible !important;
+  perspective: 1500px;
+  transform-style: preserve-3d;
+  width: 100vw;
+  height: 100vh;
+}
+
+.orbit-scaling-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.orbit-scaling-container--responsive {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+}
+
+.orbit-rotation-wrapper {
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* ─── Path / Orbit ─── */
+.orbit-path-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.10;
+  filter: drop-shadow(0 0 6px rgba(94, 158, 142, 0.20));
+}
+
+/* ─── Orbit Items ─── */
+.orbit-item {
+  position: absolute;
+  will-change: transform;
+  user-select: none;
+  transform-style: preserve-3d;
+  transition: filter 0.55s ease, transform 0.55s ease;
+}
+
+.orbit-item:hover {
+  z-index: 100 !important;
+  filter: brightness(1.15) drop-shadow(0 0 24px rgba(94, 158, 142, 0.30));
+}
+
+/* ─── Center Content ─── */
+.orbit-center-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─── Orbit Images ─── */
+.orbit-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+}
+
+/* ─── Quant Panel (research surface) ─── */
+.quant-panel {
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 11, 16, 0.80);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(94, 158, 142, 0.18);
+  border-radius: 16px;
+  padding: 20px;
+  color: #EEE9DF;
+  font-family: "JetBrains Mono", monospace;
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.75),
+    inset 0 0 24px rgba(94, 158, 142, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.quant-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(194, 160, 96, 0.25), transparent);
+}
+
+.quant-panel:hover {
+  border-color: rgba(194, 160, 96, 0.28);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(194, 160, 96, 0.08),
+    inset 0 0 36px rgba(194, 160, 96, 0.03);
+}
+
+/* ─── Panel Sub-Components ─── */
+.quant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.quant-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #5E9E8E;
+  font-weight: 500;
+}
+
+.quant-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: rgba(238, 233, 223, 0.40);
+}
+
+.quant-pulse {
+  width: 5px;
+  height: 5px;
+  background: #5E9E8E;
+  border-radius: 50%;
+  animation: pulse-glow 2s infinite;
+}
+
+.quant-pulse.gold {
+  background: #C2A060;
+}
+
+@keyframes pulse-glow {
+  0%   { transform: scale(0.9); opacity: 0.45; }
+  50%  { transform: scale(1.2); opacity: 1; box-shadow: 0 0 6px currentColor; }
+  100% { transform: scale(0.9); opacity: 0.45; }
+}
+
+.quant-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.quant-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 8px;
+  font-size: 9px;
+  color: rgba(238, 233, 223, 0.30);
+}
+
+/* ─── Premium Card Metallic Reflection ─── */
+.card-curve-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.03) 25%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.30) 100%
+  );
+  box-shadow:
+    inset 0 1.5px 3px rgba(255, 255, 255, 0.13),
+    inset 0 -1.5px 3px rgba(0, 0, 0, 0.35);
+  z-index: 25;
+  pointer-events: none;
+}
+
+/* ─── Topographic Background Drift ─── */
+.topo-drift-class {
+  animation: topo-drift 52s linear infinite;
+}
+
+@keyframes topo-drift {
+  0%   { transform: scale(1.4) translate(0px, 0px) rotate(0deg); }
+  30%  { transform: scale(1.44) translate(-8px, 12px) rotate(0.6deg); }
+  65%  { transform: scale(1.42) translate(6px, -8px) rotate(-0.4deg); }
+  100% { transform: scale(1.4) translate(0px, 0px) rotate(0deg); }
+}
+
+/* ─── Ambient Float Animation ─── */
+.continuous-orbit-animation {
+  animation: suspended-float 18s ease-in-out infinite;
+}
+
+@keyframes suspended-float {
+  0%   { transform: translateY(0px) rotateY(0deg) rotateX(0deg); }
+  28%  { transform: translateY(-4px) rotateY(0.5deg) rotateX(0.3deg); }
+  62%  { transform: translateY(2.5px) rotateY(-0.5deg) rotateX(-0.3deg); }
+  100% { transform: translateY(0px) rotateY(0deg) rotateX(0deg); }
+}
+
+/* ─── Hero Stage ─── */
+.hero-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  perspective: 2600px;
+  transform-style: preserve-3d;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3D ORBITAL COVERFLOW SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+
+.orbit-wrapper {
+  position: relative;
+  width: 100%;
+  height: 72vh;
+  perspective: 3000px;
+  transform-style: preserve-3d;
+  overflow: visible;
+}
+
+/* ─── Base Card ─── */
+.orbit-card {
+  position: absolute;
+  width: 58vw;
+  height: 68vh;
+  left: 50%;
+  top: 50%;
+  border-radius: 22px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition:
+    transform 1.35s cubic-bezier(.20, 1, .30, 1),
+    opacity   1.20s ease,
+    filter    1.20s ease,
+    box-shadow 1.20s ease;
+  will-change: transform, opacity;
+}
+
+/* ─── Center (Active) Card ─── */
+.card-center {
+  transform:
+    translate(-50%, -50%)
+    translateX(0vw)
+    translateZ(300px)
+    rotateY(0deg)
+    scale(1);
+  z-index: 10;
+  opacity: 1;
+  background: #07090E;
+  filter: blur(0px) brightness(1.04);
+  box-shadow:
+    0 48px 130px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 0 80px rgba(94, 158, 142, 0.04);
+}
+
+.main-card-hovered {
+  transform:
+    translate(-50%, -50%)
+    translateX(0vw)
+    translateZ(320px)
+    rotateY(2deg)
+    rotateX(2deg)
+    scale(1.025)
+    translateY(-5px) !important;
+  background: #07090E;
+  box-shadow:
+    0 60px 150px rgba(0, 0, 0, 0.90),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 0 100px rgba(94, 158, 142, 0.06);
+  filter: blur(0px) brightness(1.07);
+}
+
+/* ─── Left Side Cards ─── */
+.card-left-1 {
+  transform:
+    translate(-50%, -50%)
+    translateX(-24vw)
+    translateZ(30px)
+    rotateY(42deg)
+    scale(.80);
+  z-index: 6;
+  opacity: .38;
+  filter: blur(2.5px) brightness(0.40) saturate(0.45);
+}
+
+.card-left-2 {
+  transform:
+    translate(-50%, -50%)
+    translateX(-36vw)
+    translateZ(-220px)
+    rotateY(62deg)
+    scale(.58);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* ─── Right Side Cards ─── */
+.card-right-1 {
+  transform:
+    translate(-50%, -50%)
+    translateX(24vw)
+    translateZ(30px)
+    rotateY(-42deg)
+    scale(.80);
+  z-index: 6;
+  opacity: .38;
+  filter: blur(2.5px) brightness(0.40) saturate(0.45);
+}
+
+.card-right-2 {
+  transform:
+    translate(-50%, -50%)
+    translateX(36vw)
+    translateZ(-220px)
+    rotateY(-62deg)
+    scale(.58);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.orbit-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ─── Active Card Inner Vignette ─── */
+.card-center::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 25%,
+      rgba(0, 0, 0, 0.32) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.12),
+      rgba(0, 0, 0, 0.34) 100%
+    );
+  pointer-events: none;
+  z-index: 12;
+  border-radius: 22px;
+}
+
+/* ─── Overlay Content ─── */
+.content-overlay-style {
+  position: absolute;
+  left: 5%;
+  bottom: 8%;
+  z-index: 5;
+  max-width: 450px;
+}
