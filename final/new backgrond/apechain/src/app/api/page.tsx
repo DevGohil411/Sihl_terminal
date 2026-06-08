@@ -20,7 +20,7 @@ export default function ApiComingSoon() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#03060C] overflow-hidden flex flex-col items-center justify-center font-sans select-none text-white perspective-[2000px]">
+    <div className="relative min-h-screen w-full bg-[#0B1118] overflow-hidden flex flex-col items-center justify-center font-sans select-none text-white perspective-[2000px]">
       
       {/* Dynamic Hexagon Grid Background */}
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">

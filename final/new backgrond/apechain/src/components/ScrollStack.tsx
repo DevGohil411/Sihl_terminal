@@ -29,7 +29,7 @@ export default function ScrollStack({ children, index = 0 }: { children: ReactNo
         transformPerspective: 1200
       }}
     >
-      <div className="w-full h-full bg-black/40 backdrop-blur-md rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative">
+      <div className="w-full h-full bg-[#0F1720]/50 backdrop-blur-md rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative">
         {/* Cinematic edge glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
         {children}

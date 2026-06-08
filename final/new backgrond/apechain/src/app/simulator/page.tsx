@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function SimulatorPage() {
   return (
-    <div className="h-screen w-full bg-[#090b10] relative overflow-hidden">
+    <div className="h-screen w-full bg-[#0B1118] relative overflow-hidden">
       {/* Small floating back button to return to the main site */}
       <Link 
         href="/" 

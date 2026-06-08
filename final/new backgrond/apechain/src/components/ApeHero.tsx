@@ -14,7 +14,7 @@ const dapps = [
     desc: "Institutional-grade platform for real-time market data, historical tick data, and seamless trading execution routing.",
     video: "/videos/v_explore.mp4",
     color: "#4A7FA8",      // Ocean Blue
-    bgColor: "#060910",
+    bgColor: "#0B1118",
     contain: true
   },
   {
@@ -24,7 +24,7 @@ const dapps = [
     desc: "Low-latency API endpoints engineered for high-frequency and statistical arbitrage workloads.",
     video: "/videos/v_api.mp4",
     color: "#7A68A8",      // Desaturated violet slate
-    bgColor: "#0A0810",
+    bgColor: "#0F1720",
     shiftLeft: true
   },
   {
@@ -34,7 +34,7 @@ const dapps = [
     desc: "Rigorous historical simulation with slippage modeling and multi-regime performance attribution.",
     video: "/videos/v3.mp4",
     color: "#5E9E8E",      // Muted Teal
-    bgColor: "#060C0B",
+    bgColor: "#101A24",
   },
   {
     id: 3,
@@ -43,7 +43,7 @@ const dapps = [
     desc: "Advanced market intelligence terminal. Build, test, and optimize complex multi-leg portfolios.",
     video: "/videos/v4.mp4",
     color: "#C2A060",      // Soft Gold
-    bgColor: "#0D0904",
+    bgColor: "#0F1720",
   },
   {
     id: 4,
@@ -52,7 +52,7 @@ const dapps = [
     desc: "Tick-by-tick market replay. Visualize price action, imbalance zones, and strategy execution in real-time.",
     video: "/videos/v_replay.mp4",
     color: "#4E9E72",      // Deep Emerald
-    bgColor: "#060C08",
+    bgColor: "#101A24",
   }
 ];
 
@@ -194,7 +194,7 @@ export default function ApeHero() {
         />
         
         {/* Soft edge vignette fades */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020408] via-transparent to-[#020408] opacity-95" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B1118] via-transparent to-[#0B1118] opacity-80" />
       </div>
 
       {/* Spacer to align coverflow center visually */}
@@ -343,7 +343,7 @@ export default function ApeHero() {
                       className={`absolute inset-0 transition-all duration-500 z-10 rounded-[24px] ${
                         isActive 
                           ? "bg-gradient-to-t from-black via-black/25 to-transparent opacity-95" 
-                          : "bg-black/85"
+                          : "bg-[#0F1720]/85"
                       }`} 
                     />
                   </div>
@@ -518,7 +518,7 @@ export default function ApeHero() {
 
 
       {/* Floating mobile app switcher indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex md:hidden items-center gap-3 bg-black/45 backdrop-blur-md border border-white/5 rounded-full px-4 py-2 select-none">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex md:hidden items-center gap-3 bg-[#0B1118]/60 backdrop-blur-md border border-white/5 rounded-full px-4 py-2 select-none">
         {dapps.map((dapp, idx) => {
           const isActive = idx === activeIndex;
           return (
