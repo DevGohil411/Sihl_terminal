@@ -12,7 +12,7 @@ const dapps = [
     titleLines: ["SIHL", "EXPLORE"],
     tags: "DISCOVER · PLATFORM",
     desc: "Institutional-grade platform for real-time market data, historical tick data, and seamless trading execution routing.",
-    video: "/videos/v_explore.mp4",
+    video: "/videos/v_explore_new.mp4",
     color: "#4A7FA8",      // Ocean Blue
     bgColor: "#060910",
     contain: true
@@ -22,7 +22,7 @@ const dapps = [
     titleLines: ["SYSTEM", "API"],
     tags: "DATA · INTEGRATION",
     desc: "Low-latency API endpoints engineered for high-frequency and statistical arbitrage workloads.",
-    video: "/videos/v2.mp4",
+    video: "/videos/v_explore_new.mp4",
     color: "#7A68A8",      // Desaturated violet slate
     bgColor: "#0A0810",
     shiftLeft: true
@@ -44,15 +44,6 @@ const dapps = [
     video: "/videos/v4.mp4",
     color: "#C2A060",      // Soft Gold
     bgColor: "#0D0904",
-  },
-  {
-    id: 4,
-    titleLines: ["REPLAY", "BAR"],
-    tags: "VISUALIZATION · REPLAY",
-    desc: "Tick-by-tick market replay. Visualize price action, imbalance zones, and strategy execution in real-time.",
-    video: "/videos/v5.mp4",
-    color: "#4E9E72",      // Deep Emerald
-    bgColor: "#060C08",
   }
 ];
 
