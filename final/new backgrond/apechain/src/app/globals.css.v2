@@ -12,13 +12,13 @@
 
 :root {
   /* ── Foundation ── */
-  --bg-page:             #0F172A;
-  --bg-deep:             #131C2E;
-  --bg-surface:          rgba(20, 32, 50, 0.92);
-  --bg-glass:            rgba(255, 255, 255, 0.075);
-  --bg-glass-panel:      rgba(255, 255, 255, 0.050);
-  --bg-glass-hover:      rgba(255, 255, 255, 0.110);
-  --bg-glass-active:     rgba(255, 255, 255, 0.090);
+  --bg-page:             #0B1118;
+  --bg-deep:             #0F1720;
+  --bg-surface:          rgba(16, 26, 36, 0.92);
+  --bg-glass:            rgba(255, 255, 255, 0.055);
+  --bg-glass-panel:      rgba(255, 255, 255, 0.035);
+  --bg-glass-hover:      rgba(255, 255, 255, 0.085);
+  --bg-glass-active:     rgba(255, 255, 255, 0.07);
   --bg-navbar:           rgba(11, 17, 24, 0.90);
 
   /* ── Borders ── */
@@ -52,10 +52,10 @@
   --glass-blur:        blur(20px);
   --glass-blur-heavy:  blur(32px);
 
-  --shadow-card:          0 4px 24px rgba(0, 0, 0, 0.25);
-  --shadow-glass:         0 8px 32px rgba(0, 0, 0, 0.20);
-  --shadow-glass-elevated:0 16px 56px rgba(0, 0, 0, 0.30);
-  --shadow-modal:         0 24px 80px rgba(0, 0, 0, 0.40);
+  --shadow-card:          0 4px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glass:         0 8px 32px rgba(0, 0, 0, 0.30);
+  --shadow-glass-elevated:0 16px 56px rgba(0, 0, 0, 0.40);
+  --shadow-modal:         0 24px 80px rgba(0, 0, 0, 0.50);
   --shadow-gold:          0 0 40px rgba(194, 160, 96, 0.12);
 
   /* ── Typography ── */
