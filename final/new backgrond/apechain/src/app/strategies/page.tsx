@@ -163,7 +163,26 @@ export default function StrategiesPage() {
             SIHL <span className="text-neutral-500 font-normal">TERMINAL</span>
           </Link>
           <div className="h-4 w-[1px] bg-neutral-800 mx-2" />
-          <span className="text-xs text-neutral-400">Strategy Dashboard</span>
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { label: "Dashboard", href: "/" },
+              { label: "Strategies", href: "/strategies", active: true },
+              { label: "Reports", href: "/terminal" },
+              { label: "Strategy Builder", href: "/strategy-builder" },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  item.active
+                    ? "text-emerald-400 bg-emerald-500/10"
+                    : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
