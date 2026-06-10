@@ -33,9 +33,19 @@ class OHLCCandle:
 # Try backend/data first, fallback to ../data (sibling of backend folder)
 _backend_data = Path(__file__).parent.parent.parent / "data"
 _sibling_data = Path(__file__).parent.parent.parent.parent / "data"
-BASE_DIR = _backend_data if (_backend_data / "options_v3.duckdb").exists() else _sibling_data
-DB_PATH = BASE_DIR / "options_v3.duckdb"
-SPOT_DB_PATH = BASE_DIR / "spot_v3.duckdb"
+
+# Also check env vars for explicit paths (used by .env config)
+import os
+_env_options = os.environ.get("DUCKDB_OPTIONS_PATH")
+_env_spot = os.environ.get("DUCKDB_SPOT_PATH")
+
+if _env_options and Path(_env_options).exists():
+    DB_PATH = Path(_env_options)
+    SPOT_DB_PATH = Path(_env_spot) if _env_spot and Path(_env_spot).exists() else Path(_env_options).parent / "spot_v3.duckdb"
+else:
+    BASE_DIR = _backend_data if (_backend_data / "options_v3.duckdb").exists() else _sibling_data
+    DB_PATH = BASE_DIR / "options_v3.duckdb"
+    SPOT_DB_PATH = BASE_DIR / "spot_v3.duckdb"
 
 from app.data.constants import STRIKE_INTERVALS, LOT_SIZES
 

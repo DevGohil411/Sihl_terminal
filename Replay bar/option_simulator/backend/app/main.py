@@ -40,27 +40,36 @@ app = FastAPI(
 )
 
 # ─── CORS CONFIGURATION ────────────────────────────────────────────────────────
-# Allow all local dev origins + match any Vercel preview deployment via regex
-_cors_origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-    "http://localhost:3002",
-    "http://127.0.0.1:3002",
-    "https://sihl-terminal12.vercel.app",
-]
+# Load from env for flexibility; default to localhost dev origins
+_cors_allow_all = os.environ.get("CORS_ALLOW_ALL", "true").lower() == "true"
+_cors_origins_env = os.environ.get("CORS_ORIGINS", "")
 
-app.add_middleware(
-    CORSMiddleware,
+if _cors_allow_all:
+    _cors_origins = ["*"]
+else:
+    _cors_origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+    ]
+    if _cors_origins_env:
+        _cors_origins += [o.strip() for o in _cors_origins_env.split(",") if o.strip()]
+
+_cors_kwargs = dict(
     allow_origins=_cors_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+if not _cors_allow_all:
+    _cors_kwargs["allow_origin_regex"] = r"https://.*\.vercel\.app"
+
+app.add_middleware(CORSMiddleware, **_cors_kwargs)
 
 # In-memory session store (use Redis in production)
 _sessions: dict[str, ReplaySession] = {}
@@ -201,6 +210,10 @@ def _serialize_frame(frame: SessionFrame) -> dict:
         "pcr": frame.pcr,
         "max_pain_strike": frame.max_pain_strike,
         "gex": frame.gex,
+        "expected_move": frame.expected_move,
+        "day_open": frame.day_open,
+        "trade_log": frame.trade_log,
+        "trade_quality": frame.trade_quality,
         "sl_tp_events": frame.sl_tp_events,
     }
     encoded = jsonable_encoder(data)
@@ -826,7 +839,7 @@ async def startup_event():
         local_ip = socket.getaddrinfo(hostname, None)[0][4][0]
         print(f"[STARTUP] Hostname: {hostname}")
         print(f"[STARTUP] Local IP: {local_ip}")
-        print(f"[STARTUP] CORS_ALLOW_ALL: {_allow_all}")
+        print(f"[STARTUP] CORS_ALLOW_ALL: {_cors_allow_all}")
         print(f"[STARTUP] CORS origins: {_cors_origins}")
     except Exception as e:
         print(f"[STARTUP] Could not resolve network info: {e}")
