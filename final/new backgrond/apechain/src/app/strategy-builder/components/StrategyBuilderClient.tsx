@@ -7,11 +7,10 @@ import {
   ChevronDown,
   Plus,
   Trash2,
-  Info,
-  LayoutDashboard,
+  TreePine,
   BarChart3,
   FileText,
-  Settings,
+  Wrench,
   Search,
   Check,
 } from "lucide-react";
@@ -56,11 +55,11 @@ function SelectField({
 
   return (
     <div className="relative">
-      {label && <label className="block text-xs font-medium text-gray-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">{label}</label>}
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+        className="w-full flex items-center justify-between bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2 text-sm text-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00D4FF]/20 focus:border-[#00D4FF] transition-all"
       >
         <span className={value ? "text-gray-900" : "text-gray-400"}>
           {value || placeholder}
@@ -76,10 +75,10 @@ function SelectField({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.15 }}
-              className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-elevated max-h-60 overflow-auto"
+              className="absolute z-50 mt-1 w-full bg-white/[0.03] border border-white/[0.06] rounded-md shadow-elevated max-h-60 overflow-auto"
             >
               {searchable && (
-                <div className="p-2 border-b border-gray-100 sticky top-0 bg-white">
+                <div className="p-2 border-b border-white/[0.04] sticky top-0 bg-white/[0.03]">
                   <div className="relative">
                     <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -87,7 +86,7 @@ function SelectField({
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Search..."
-                      className="w-full pl-7 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:border-emerald-500"
+                      className="w-full pl-7 pr-2 py-1.5 text-sm border border-white/[0.06] rounded focus:outline-none focus:border-[#00D4FF]"
                     />
                   </div>
                 </div>
@@ -101,8 +100,8 @@ function SelectField({
                     setOpen(false);
                     setSearch("");
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                    value === opt ? "bg-emerald-50 text-emerald-700 font-medium" : "text-gray-700"
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.02] transition-colors flex items-center justify-between ${
+                    value === opt ? "bg-[#00D4FF]/10 text-[#00B4A6] font-medium" : "text-gray-700"
                   }`}
                 >
                   {opt}
@@ -133,11 +132,11 @@ function DaysMultiSelect({
 
   return (
     <div className="relative">
-      <label className="block text-xs font-medium text-gray-700 mb-1.5">Enter On Days</label>
+      <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">Enter On Days</label>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+        className="w-full flex items-center justify-between bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2 text-sm text-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00D4FF]/20 focus:border-[#00D4FF] transition-all"
       >
         <span className={value.length ? "text-gray-900" : "text-gray-400"}>
           {value.length ? value.join(", ") : "Select days..."}
@@ -153,15 +152,15 @@ function DaysMultiSelect({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.15 }}
-              className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-elevated"
+              className="absolute z-50 mt-1 w-full bg-white/[0.03] border border-white/[0.06] rounded-md shadow-elevated"
             >
               {DAYS.map((day) => (
                 <button
                   key={day}
                   type="button"
                   onClick={() => toggle(day)}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                    value.includes(day) ? "bg-emerald-50 text-emerald-700 font-medium" : "text-gray-700"
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.02] transition-colors flex items-center justify-between ${
+                    value.includes(day) ? "bg-[#00D4FF]/10 text-[#00B4A6] font-medium" : "text-gray-700"
                   }`}
                 >
                   {day}
@@ -192,13 +191,13 @@ function InputField({
 }) {
   return (
     <div>
-      {label && <label className="block text-xs font-medium text-gray-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">{label}</label>}
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 placeholder-gray-400 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2 text-sm text-white placeholder-gray-400 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00D4FF]/20 focus:border-[#00D4FF] transition-all"
       />
     </div>
   );
@@ -307,27 +306,28 @@ export default function StrategyBuilderClient() {
   const summary = useMemo(() => calculateSummary(strategy.legs, strategy.capital), [strategy.legs, strategy.capital]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="min-h-screen bg-[#0B1120] text-white font-sans">
       {/* Top Navigation */}
-      <nav className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="font-semibold text-lg tracking-tight text-gray-900">
-            SIHL <span className="text-gray-400 font-normal">TERMINAL</span>
+      <nav className="h-16 border-b border-white/[0.06] flex items-center justify-between px-6 sticky top-0 z-30"
+        style={{ background: "rgba(11, 17, 32, 0.95)", backdropFilter: "blur(20px)" }}>
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
+            <TreePine size={22} className="text-[#00D4FF]" />
+            <span className="text-[#00D4FF]">Algofy</span>
           </Link>
           <div className="hidden md:flex items-center gap-1">
             {[
-              { label: "Dashboard", href: "/", icon: LayoutDashboard },
-              { label: "Strategies", href: "/strategies", icon: BarChart3 },
+              { label: "Our Strategies", href: "/strategies", icon: BarChart3 },
+              { label: "No Code Strategies", href: "/strategy-builder", icon: Wrench, active: true },
               { label: "Reports", href: "/terminal", icon: FileText },
-              { label: "Strategy Builder", href: "/strategy-builder", icon: Settings, active: true },
             ].map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   item.active
-                    ? "text-emerald-600 bg-emerald-50"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20"
+                    : "text-[#8A95A8] hover:text-white hover:bg-white/5"
                 }`}
               >
                 <item.icon size={14} />
@@ -336,19 +336,23 @@ export default function StrategyBuilderClient() {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400">RAJESHWARI GOHIL</span>
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C853] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00C853]" />
+          </span>
+          <span className="text-[11px] font-medium text-[#5A6680]">Live Engine</span>
         </div>
       </nav>
 
       {/* Main Content */}
       <div className="max-w-[1440px] mx-auto p-6">
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-8">Strategy Builder</h1>
+        <h1 className="text-2xl font-bold text-center text-white mb-8">No Code Strategies</h1>
 
         {/* Top 3 Sections */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Pre Build Strategies</label>
+            <label className="block text-sm font-semibold text-white mb-2">Pre Build Strategies</label>
             <SelectField
               value={strategy.name && PRE_BUILT_STRATEGIES.includes(strategy.name) ? strategy.name : ""}
               onChange={selectPreBuilt}
@@ -357,16 +361,16 @@ export default function StrategyBuilderClient() {
             />
           </div>
           <div className="flex flex-col justify-end">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Create</label>
+            <label className="block text-sm font-semibold text-white mb-2">Create</label>
             <button
               onClick={reset}
-              className="w-full py-2.5 px-4 border border-emerald-600 text-emerald-600 rounded-md text-sm font-semibold hover:bg-emerald-50 transition-colors"
+              className="w-full py-2.5 px-4 border border-[#00D4FF] text-[#00D4FF] rounded-md text-sm font-semibold hover:bg-[#00D4FF]/10 transition-colors"
             >
               Create Own Strategy
             </button>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Custom</label>
+            <label className="block text-sm font-semibold text-white mb-2">Custom</label>
             <SelectField
               value={strategy.name && SAVED_STRATEGIES.includes(strategy.name) ? strategy.name : ""}
               onChange={selectSaved}
@@ -413,8 +417,8 @@ export default function StrategyBuilderClient() {
           {/* Left Column */}
           <div className="flex-1 space-y-6">
             {/* Position Builder */}
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-card">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Positions</h3>
+            <div className="bg-white/[0.03] rounded-lg border border-white/[0.06] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+              <h3 className="text-base font-semibold text-white mb-4">Positions</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 items-end mb-4">
                 <SelectField
                   label="Segment"
@@ -454,7 +458,7 @@ export default function StrategyBuilderClient() {
                 />
                 <button
                   onClick={addLeg}
-                  className="h-[38px] flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-medium transition-colors px-4"
+                  className="h-[38px] flex items-center justify-center gap-1.5 bg-[#00D4FF] hover:bg-[#00B4A6] text-white rounded-md text-sm font-medium transition-colors px-4"
                 >
                   <Plus size={14} />
                   Add
@@ -467,26 +471,26 @@ export default function StrategyBuilderClient() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Action</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Strike</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Value</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Expiry</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Segment</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">Lots</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">TGT</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">SL</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase">TRL</th>
-                        <th className="py-2 px-2 text-[11px] font-medium text-gray-500 uppercase"></th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Action</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Strike</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Value</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Expiry</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Segment</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">Lots</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">TGT</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">SL</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase">TRL</th>
+                        <th className="py-2 px-2 text-[11px] font-medium text-[#5A6680] uppercase"></th>
                       </tr>
                     </thead>
                     <tbody>
                       {strategy.legs.map((leg) => (
-                        <tr key={leg.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <tr key={leg.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                           <td className="py-2 px-2">
                             <span
                               className={`inline-flex items-center justify-center w-6 h-6 rounded text-[10px] font-bold ${
                                 leg.action === "BUY"
-                                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                  ? "bg-emerald-100 text-[#00B4A6] border border-emerald-200"
                                   : "bg-red-100 text-red-700 border border-red-200"
                               }`}
                             >
@@ -497,7 +501,7 @@ export default function StrategyBuilderClient() {
                             <select
                               value={leg.strike}
                               onChange={(e) => updateLeg(leg.id, { strike: e.target.value })}
-                              className="text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             >
                               {["ATM", "ITM", "OTM", "ATM Futures"].map((o) => (
                                 <option key={o}>{o}</option>
@@ -508,7 +512,7 @@ export default function StrategyBuilderClient() {
                             <select
                               value={leg.value}
                               onChange={(e) => updateLeg(leg.id, { value: e.target.value })}
-                              className="text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             >
                               {["ITM 1", "ITM 2", "ATM", "OTM 1", "OTM 2", "OTM 5", "OTM 8", "OTM 10"].map((o) => (
                                 <option key={o}>{o}</option>
@@ -519,7 +523,7 @@ export default function StrategyBuilderClient() {
                             <select
                               value={leg.expiry}
                               onChange={(e) => updateLeg(leg.id, { expiry: e.target.value })}
-                              className="text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             >
                               {["Current Week", "Next Week", "Current Month", "Next Month"].map((o) => (
                                 <option key={o}>{o}</option>
@@ -530,7 +534,7 @@ export default function StrategyBuilderClient() {
                             <select
                               value={leg.segment}
                               onChange={(e) => updateLeg(leg.id, { segment: e.target.value as any })}
-                              className="text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             >
                               {["CE", "PE", "FUTURES"].map((o) => (
                                 <option key={o}>{o}</option>
@@ -541,7 +545,7 @@ export default function StrategyBuilderClient() {
                             <select
                               value={leg.lots}
                               onChange={(e) => updateLeg(leg.id, { lots: parseInt(e.target.value) })}
-                              className="text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             >
                               {LOTS_OPTIONS.map((o) => (
                                 <option key={o}>{o}</option>
@@ -553,7 +557,7 @@ export default function StrategyBuilderClient() {
                               type="number"
                               value={leg.target}
                               onChange={(e) => updateLeg(leg.id, { target: Number(e.target.value) })}
-                              className="w-14 text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="w-14 text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             />
                           </td>
                           <td className="py-2 px-2">
@@ -561,7 +565,7 @@ export default function StrategyBuilderClient() {
                               type="number"
                               value={leg.stoploss}
                               onChange={(e) => updateLeg(leg.id, { stoploss: Number(e.target.value) })}
-                              className="w-14 text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="w-14 text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             />
                           </td>
                           <td className="py-2 px-2">
@@ -569,7 +573,7 @@ export default function StrategyBuilderClient() {
                               type="number"
                               value={leg.trail}
                               onChange={(e) => updateLeg(leg.id, { trail: Number(e.target.value) })}
-                              className="w-14 text-sm border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-emerald-500"
+                              className="w-14 text-sm border border-white/[0.06] rounded px-2 py-1 bg-white/[0.03] focus:outline-none focus:border-[#00D4FF]"
                             />
                           </td>
                           <td className="py-2 px-2">
@@ -587,18 +591,18 @@ export default function StrategyBuilderClient() {
                 </div>
               )}
               {strategy.legs.length === 0 && (
-                <div className="py-8 text-center text-sm text-gray-400 border border-dashed border-gray-200 rounded-md">
+                <div className="py-8 text-center text-sm text-[#5A6680] border border-dashed border-white/[0.06] rounded-md">
                   No legs added yet. Configure and click Add to build your strategy.
                 </div>
               )}
             </div>
 
             {/* Entry Settings */}
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-card">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Entry Setting</h3>
+            <div className="bg-white/[0.03] rounded-lg border border-white/[0.06] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+              <h3 className="text-base font-semibold text-white mb-4">Entry Setting</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Entry Time (hh:mm)</label>
+                  <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">Entry Time (hh:mm)</label>
                   <div className="flex gap-2">
                     <SelectField
                       value={strategy.entryHour}
@@ -620,11 +624,11 @@ export default function StrategyBuilderClient() {
             </div>
 
             {/* Exit Settings */}
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-card">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">Exit Setting</h3>
+            <div className="bg-white/[0.03] rounded-lg border border-white/[0.06] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+              <h3 className="text-base font-semibold text-white mb-4">Exit Setting</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Profit MTM</label>
+                  <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">Profit MTM</label>
                   <div className="flex gap-2">
                     <SelectField
                       value={strategy.profitMtmType}
@@ -636,13 +640,13 @@ export default function StrategyBuilderClient() {
                         type="number"
                         value={strategy.profitMtmValue}
                         onChange={(e) => updateStrategy("profitMtmValue", Number(e.target.value))}
-                        className="w-24 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                        className="w-24 bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00D4FF]/20 focus:border-[#00D4FF]"
                       />
                     )}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Stoploss MTM</label>
+                  <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">Stoploss MTM</label>
                   <div className="flex gap-2">
                     <SelectField
                       value={strategy.stoplossMtmType}
@@ -654,7 +658,7 @@ export default function StrategyBuilderClient() {
                         type="number"
                         value={strategy.stoplossMtmValue}
                         onChange={(e) => updateStrategy("stoplossMtmValue", Number(e.target.value))}
-                        className="w-24 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                        className="w-24 bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00D4FF]/20 focus:border-[#00D4FF]"
                       />
                     )}
                   </div>
@@ -696,7 +700,7 @@ export default function StrategyBuilderClient() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Exit Time (hh:mm)</label>
+                  <label className="block text-xs font-medium text-[#8A95A8] mb-1.5">Exit Time (hh:mm)</label>
                   <div className="flex gap-2">
                     <SelectField
                       value={strategy.exitHour}
@@ -732,8 +736,8 @@ export default function StrategyBuilderClient() {
           {/* Right Sidebar - Strategy Summary */}
           <aside className="w-full lg:w-72 shrink-0">
             <div className="sticky top-20 space-y-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-card">
-                <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="bg-white/[0.03] rounded-lg border border-white/[0.06] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
                   <BarChart3 size={14} className="text-emerald-600" />
                   Strategy Summary
                 </h3>
@@ -775,10 +779,10 @@ export default function StrategyBuilderClient() {
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-semibold transition-colors shadow-elevated">
+              <button className="w-full py-3 bg-[#00D4FF] hover:bg-[#00B4A6] text-white rounded-md text-sm font-semibold transition-colors shadow-elevated">
                 Save Strategy
               </button>
-              <button className="w-full py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md text-sm font-semibold transition-colors">
+              <button className="w-full py-3 bg-white/[0.03] border border-white/[0.08] text-[#8A95A8] hover:bg-white/[0.02] rounded-md text-sm font-semibold transition-colors">
                 Backtest Strategy
               </button>
             </div>
