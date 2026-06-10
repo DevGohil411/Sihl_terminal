@@ -6,6 +6,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  output: 'export',
+  distDir: '.next',
 
   // Environment variables available at build time
   env: {
