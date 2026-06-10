@@ -1,0 +1,7 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd \"final/new backgrond/apechain\" && npm install && npm run build",
+  "outputDirectory": "final/new backgrond/apechain/.next",
+  "installCommand": "cd \"final/new backgrond/apechain\" && npm install",
+  "devCommand": "cd \"final/new backgrond/apechain\" && npm run dev"
+}
