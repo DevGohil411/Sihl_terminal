@@ -203,7 +203,7 @@ export default function StrategyDetailPanel({ strategy, onClose }: { strategy: S
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                         <XAxis dataKey="spot" tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => v.toLocaleString("en-IN")} stroke="rgba(255,255,255,0.1)" />
                         <YAxis tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}K`} stroke="rgba(255,255,255,0.1)" />
-                        <Tooltip contentStyle={{ backgroundColor: "#0F1A2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "12px", color: "#E8ECF1" }} formatter={(value: number) => [`₹${value.toLocaleString("en-IN")}`, "Payoff"]} labelFormatter={(label: number) => `Spot: ${label.toLocaleString("en-IN")}`} />
+                        <Tooltip contentStyle={{ backgroundColor: "#0F1A2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "12px", color: "#E8ECF1" }} formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Payoff"]} labelFormatter={(label: any) => `Spot: ${Number(label).toLocaleString("en-IN")}`} />
                         <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="3 3" />
                         <ReferenceLine x={22500} stroke="#00D4FF" strokeDasharray="4 4" label={{ value: "Current", position: "top", fill: "#00D4FF", fontSize: 10 }} />
                         <Area type="monotone" dataKey="payoff" stroke="#00D4FF" strokeWidth={2} fill="url(#profitGradDetail)" fillOpacity={1} />

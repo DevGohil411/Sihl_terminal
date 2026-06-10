@@ -77,9 +77,8 @@ export default function PayoffChart({ legs }: { legs: StrategyLeg[] }) {
                 fontSize: "12px",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
               }}
-              formatter={(value: number) => [`₹${value.toLocaleString("en-IN")}`, "Payoff"]
-              }
-              labelFormatter={(label: number) => `Spot: ${label.toLocaleString("en-IN")}`}
+              formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Payoff"]}
+              labelFormatter={(label: any) => `Spot: ${Number(label).toLocaleString("en-IN")}`}
             />
             <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="3 3" />
             <ReferenceLine
