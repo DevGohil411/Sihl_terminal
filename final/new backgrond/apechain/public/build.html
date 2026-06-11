@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIFTY 50 — Replay Engine v3 (Setup)</title>
+<meta name="description" content="High-performance TradingView-style bar replay">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root{
+  --bg0:#0d1117;--bg1:#131722;--bg2:#1e222d;--bg3:#2a2e39;--bg4:#363a4e;
+  --border:#2e3347;--border2:#4a4f62;
+  --txt:#d1d4dc;--txt2:#787b86;--txt3:#4a4f62;
+  --accent:#2962ff;--accent2:#1e53e5;
+  --green:#26a69a;--green2:#00B050;
+  --red:#ef5350;--red2:#FF3A3A;
+  --gold:#f59e0b;--purple:#9c27b0;--orange:#ff9800;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --r:5px;--r2:9px;
+  --shadow:0 8px 32px rgba(0,0,0,.6);
+  --tr:.13s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--txt);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}
+
+/* ── LOADING ─────────────────────────────────────── */
+#loading{position:fixed;inset:0;background:var(--bg0);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+#loading-logo{font-size:32px;font-weight:800;letter-spacing:-1px;color:var(--accent)}
+.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-text{color:var(--txt2);font-size:14px}
+
+/* ── TOOLBAR ─────────────────────────────────────── */
+#toolbar{
+  height:46px;display:flex;align-items:center;gap:5px;
+  padding:0 10px;background:var(--bg2);border-bottom:1px solid var(--border);
+  position:relative;z-index:100;overflow-x:auto;scrollbar-width:none;flex-shrink:0
+}
+#toolbar::-webkit-scrollbar{display:none}
+.sym-box{display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:var(--r);background:var(--bg4);border:1px solid var(--border2);cursor:default}
+.sym-name{font-weight:700;font-size:14px}
+.sym-ex{font-size:10px;color:var(--txt2);text-transform:uppercase}
+.divider{width:1px;height:22px;background:var(--border);flex-shrink:0;margin:0 3px}
+
+.tf-btn{padding:4px 8px;border:none;border-radius:var(--r);background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap;font-family:var(--font)}
+.tf-btn:hover{background:var(--bg4);color:var(--txt)}
+.tf-btn.active{background:var(--accent);color:#fff}
+
+.tb-btn{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--txt);font-size:12px;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap;font-family:var(--font)}
+.tb-btn:hover{background:var(--bg4);border-color:var(--border2)}
+.tb-btn.on{background:var(--bg4);border-color:var(--accent);color:var(--accent)}
+
+#jump-date{padding:4px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:11px;outline:none;cursor:pointer}
+#jump-date:focus{border-color:var(--accent)}
+#jump-date::-webkit-calendar-picker-indicator{filter:invert(.5)}
+
+#tb-right{margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0}
+
+/* ── DRAWING SIDEBAR ─────────────────────────────── */
+#draw-bar{
+  position:absolute;left:0;top:46px;bottom:0;width:42px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:6px 0;gap:3px;z-index:50
+}
+.d-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);border:none;background:transparent;color:var(--txt2);font-size:14px;cursor:pointer;transition:var(--tr);position:relative}
+.d-btn:hover{background:var(--bg4);color:var(--txt)}
+.d-btn.active{background:var(--accent);color:#fff}
+.d-btn[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:38px;top:50%;transform:translateY(-50%);background:var(--bg3);border:1px solid var(--border2);color:var(--txt);padding:3px 8px;border-radius:var(--r);font-size:11px;white-space:nowrap;pointer-events:none;z-index:999}
+.d-sep{width:20px;height:1px;background:var(--border);margin:3px 0}
+
+/* ── MAIN LAYOUT ─────────────────────────────────── */
+#shell{display:flex;flex-direction:column;height:calc(100vh - 46px);margin-left:42px}
+#chart-wrap{display:flex;flex-direction:column;flex:1;min-height:0;position:relative}
+#main-chart{flex:1;min-height:0;position:relative}
+#lwc{width:100%;height:100%}
+
+/* ── CROSSHAIR TOOLTIP ───────────────────────────── */
+#xhair{
+  position:absolute;top:8px;left:8px;
+  display:none;flex-wrap:wrap;gap:10px;
+  background:rgba(19,23,34,.92);border:1px solid var(--border2);
+  border-radius:var(--r);padding:5px 10px;
+  font-family:var(--mono);font-size:11px;pointer-events:none;z-index:200;
+  backdrop-filter:blur(4px)
+}
+#xhair.show{display:flex}
+.xh-item{display:flex;flex-direction:column;gap:1px}
+.xh-label{color:var(--txt3);font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.xh-val{color:var(--txt);font-weight:600}
+.xh-green{color:var(--green)}
+.xh-red{color:var(--red)}
+
+/* ── ST DEBUG PANEL ──────────────────────────────── */
+#st-debug{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  display:none;flex-wrap:wrap;gap:10px;
+  background:rgba(19,23,34,.92);border:1px solid var(--border2);
+  border-radius:var(--r);padding:5px 10px;
+  font-family:var(--mono);font-size:11px;pointer-events:none;z-index:200;
+  backdrop-filter:blur(4px)
+}
+#st-debug.show{display:flex}
+
+/* ── LEGEND ──────────────────────────────────────── */
+#legend{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px;pointer-events:none;z-index:30}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;background:rgba(19,23,34,.85);padding:2px 7px;border-radius:3px;pointer-events:auto;border:1px solid var(--border)}
+.leg-dot{width:12px;height:2px;border-radius:2px;flex-shrink:0}
+.leg-gear{background:none;border:none;color:var(--txt2);font-size:11px;cursor:pointer;padding:0 2px}
+.leg-gear:hover{color:var(--txt)}
+.leg-x{background:none;border:none;color:var(--txt3);font-size:12px;cursor:pointer;padding:0 2px}
+.leg-x:hover{color:var(--red)}
+
+/* ── PANE AREA ───────────────────────────────────── */
+#pane-area{flex-shrink:0}
+.ind-pane{position:relative;border-top:1px solid var(--border);min-height:110px}
+.pane-lbl{position:absolute;top:5px;left:8px;font-size:10px;color:var(--txt2);font-weight:600;z-index:5;pointer-events:none}
+.pane-x{position:absolute;top:3px;right:6px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:none;background:transparent;color:var(--txt3);font-size:13px;cursor:pointer;z-index:10}
+.pane-x:hover{background:var(--bg4);color:var(--red)}
+.pane-chart-div{width:100%;height:100%}
+
+/* ── REPLAY BAR (TradingView-style sleek) ────────── */
+#replay-bar{
+  display:flex;align-items:center;gap:6px;padding:5px 14px;
+  background:var(--bg1);border-top:1px solid var(--border);flex-shrink:0;z-index:40;
+  height:36px;
+}
+.r-btn{
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;border:1px solid var(--border);background:var(--bg2);
+  color:var(--txt);font-size:11px;cursor:pointer;transition:var(--tr);flex-shrink:0
+}
+.r-btn:hover{background:var(--bg3);border-color:var(--border2)}
+.r-btn.play{background:var(--green);border-color:var(--green);color:#fff}
+.r-btn.pause{background:var(--red);border-color:var(--red);color:#fff}
+.r-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* Progress track */
+#rslider{flex:1;height:3px;border-radius:2px;background:var(--border2);outline:none;cursor:pointer;-webkit-appearance:none;margin:0 8px}
+#rslider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;transition:transform var(--tr);box-shadow:0 0 3px rgba(0,0,0,.5)}
+#rslider::-webkit-slider-thumb:hover{transform:scale(1.4)}
+
+/* Speed */
+.spd-grp{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt2);flex-shrink:0;white-space:nowrap}
+#spd-slider{width:60px;height:3px;cursor:pointer;-webkit-appearance:none;background:var(--border2);border-radius:2px}
+#spd-slider::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;border-radius:50%;background:var(--accent);cursor:pointer}
+#spd-lbl{min-width:28px;text-align:right;font-size:10px}
+
+/* Status text — compact */
+#status{font-family:var(--mono);font-size:10px;color:var(--txt2);white-space:nowrap;padding:2px 8px;background:var(--bg0);border-radius:3px;border:1px solid var(--border);min-width:160px;letter-spacing:.3px}
+
+/* Divider */
+.r-sep{width:1px;height:16px;background:var(--border);flex-shrink:0;margin:0 2px}
+
+/* ── POPUPS ──────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.popup{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:pop .14s ease}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(-8px)}to{opacity:1;transform:none}}
+.pop-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.pop-title{font-size:14px;font-weight:600}
+.pop-close{background:none;border:none;color:var(--txt2);font-size:17px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:var(--r)}
+.pop-close:hover{background:var(--bg4);color:var(--red)}
+
+/* Indicator library */
+#ind-popup .popup{width:500px;max-height:76vh}
+#ind-search{margin:10px 14px;padding:7px 11px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:13px;outline:none;font-family:var(--font);transition:var(--tr)}
+#ind-search:focus{border-color:var(--accent)}
+#ind-search::placeholder{color:var(--txt3)}
+#ind-list{flex:1;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.ind-cat{padding:5px 16px 2px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:6px}
+.ind-row{display:flex;align-items:center;padding:7px 16px;cursor:pointer;transition:var(--tr);gap:9px}
+.ind-row:hover{background:var(--bg4)}
+.badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.b-ovl{background:rgba(41,98,255,.2);color:var(--accent)}
+.b-pane{background:rgba(239,83,80,.2);color:var(--red)}
+.ind-name{font-weight:500;flex:1}
+.ind-desc{font-size:11px;color:var(--txt2)}
+.add-btn{padding:3px 9px;border-radius:var(--r);border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap;font-family:var(--font)}
+.add-btn:hover{background:var(--accent);color:#fff}
+
+/* Settings */
+#set-popup .popup{width:360px;max-height:80vh}
+.set-form{padding:14px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scrollbar-width:thin}
+.set-row{display:flex;flex-direction:column;gap:4px}
+.set-lbl{font-size:10px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.set-inp{padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:13px;outline:none;font-family:var(--font);transition:var(--tr);width:100%}
+.set-inp:focus{border-color:var(--accent)}
+.set-inp[type=color]{padding:2px 5px;height:32px;cursor:pointer}
+.set-sel{padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:13px;outline:none;width:100%;cursor:pointer}
+.pop-foot{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn-ok{padding:7px 16px;background:var(--accent);border:none;color:#fff;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.btn-ok:hover{background:var(--accent2)}
+.btn-cancel{padding:7px 16px;background:transparent;border:1px solid var(--border);color:var(--txt2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.btn-cancel:hover{background:var(--bg4);color:var(--txt)}
+
+/* ── TOAST ───────────────────────────────────────── */
+#toast{position:fixed;bottom:72px;right:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:8px 14px;font-size:12px;color:var(--txt);box-shadow:var(--shadow);z-index:1000;opacity:0;transform:translateY(8px);transition:all .22s ease;pointer-events:none}
+#toast.show{opacity:1;transform:none}
+
+/* ── DRAWING CURSOR ──────────────────────────────── */
+#lwc.draw-cursor{cursor:crosshair}
+
+/* ── SETUP SCREEN ────────────────────────────────── */
+#setup-screen{
+  position:fixed;inset:0;background:var(--bg0);z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:24px;
+}
+#setup-screen.hidden{display:none}
+.setup-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);
+  padding:32px 40px;width:420px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:18px;
+}
+.setup-title{font-size:20px;font-weight:700;color:var(--txt);text-align:center}
+.setup-sub{font-size:12px;color:var(--txt2);text-align:center;margin-top:-10px}
+.setup-row{display:flex;flex-direction:column;gap:6px}
+.setup-lbl{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.setup-inp{padding:8px 12px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:13px;outline:none;font-family:var(--font);width:100%}
+.setup-inp:focus{border-color:var(--accent)}
+.setup-sel{padding:8px 12px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:13px;outline:none;font-family:var(--font);width:100%;cursor:pointer}
+.setup-btn{padding:12px 20px;background:var(--accent);border:none;border-radius:var(--r);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:var(--tr);text-align:center;margin-top:6px}
+.setup-btn:hover{background:var(--accent2)}
+.setup-btn:disabled{opacity:.4;cursor:not-allowed}
+.setup-logo{font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--accent);text-align:center}
+.setup-ver{font-size:11px;background:var(--green);color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:6px;font-weight:700}
+.setup-info{font-size:11px;color:var(--txt3);text-align:center}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <div id="loading-logo">📈 NIFTY Engine v2</div>
+  <div class="spin"></div>
+  <div id="loading-text">Initialising high-performance replay…</div>
+</div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <div class="sym-box"><div><div class="sym-name">NIFTY 50</div><div class="sym-ex">NSE · INDEX</div></div></div>
+  <div class="divider"></div>
+  <button class="tf-btn" data-tf="1m"  onclick="switchTF('1m')">1m</button>
+  <button class="tf-btn" data-tf="3m"  onclick="switchTF('3m')">3m</button>
+  <button class="tf-btn" data-tf="5m"  onclick="switchTF('5m')">5m</button>
+  <button class="tf-btn" data-tf="15m" onclick="switchTF('15m')">15m</button>
+  <button class="tf-btn" data-tf="30m" onclick="switchTF('30m')">30m</button>
+  <button class="tf-btn" data-tf="45m" onclick="switchTF('45m')">45m</button>
+  <button class="tf-btn" data-tf="1H"  onclick="switchTF('1H')">1H</button>
+  <button class="tf-btn" data-tf="2H"  onclick="switchTF('2H')">2H</button>
+  <button class="tf-btn" data-tf="4H"  onclick="switchTF('4H')">4H</button>
+  <button class="tf-btn" data-tf="D"   onclick="switchTF('D')">D</button>
+  <button class="tf-btn" data-tf="W"   onclick="switchTF('W')">W</button>
+  <div class="divider"></div>
+  <button class="tb-btn" onclick="openIndLib()">ƒ Indicators</button>
+  <button class="tb-btn" id="st-debug-btn" onclick="toggleSTDebug()">📊 ST Debug</button>
+  <div class="divider"></div>
+  <label style="font-size:11px;color:var(--txt2);white-space:nowrap">Jump to:</label>
+  <input type="date" id="jump-date" onchange="jumpToDate(this.value)" title="Jump replay to date">
+
+  <div id="tb-right">
+    <button class="tb-btn" onclick="fitChart()" title="Fit (F)">⊞ Fit</button>
+    <button class="tb-btn" onclick="takeScreenshot()" title="Screenshot">📷</button>
+    <button class="tb-btn" onclick="openMonthly()">📅 Monthly</button>
+  </div>
+</div>
+
+<!-- DRAWING TOOLS SIDEBAR -->
+<div id="draw-bar">
+  <button class="d-btn active" data-tool="cursor"    data-tip="Cursor (V)"            onclick="setTool('cursor')"   id="tool-cursor">↖</button>
+  <button class="d-btn"        data-tool="hline"     data-tip="H-Line (H)"            onclick="setTool('hline')">—</button>
+  <button class="d-btn"        data-tool="trendline" data-tip="Trend Line (T)"         onclick="setTool('trendline')">╱</button>
+  <button class="d-btn"        data-tool="ray"       data-tip="Ray (R)"               onclick="setTool('ray')">→</button>
+  <button class="d-btn"        data-tool="rect"      data-tip="Rectangle (G)"         onclick="setTool('rect')">▭</button>
+  <button class="d-btn"        data-tool="fib"       data-tip="Fib Retracement (B)"   onclick="setTool('fib')">🌀</button>
+  <button class="d-btn"        data-tool="arrow"     data-tip="Arrow (A)"             onclick="setTool('arrow')">↑</button>
+  <div class="d-sep"></div>
+  <div style="flex:1"></div>
+  <button class="d-btn" data-tip="Clear Drawings" onclick="clearDrawings()" style="color:var(--red)">🗑</button>
+</div>
+
+<!-- MAIN SHELL -->
+<div id="shell">
+  <div id="chart-wrap">
+    <div id="main-chart">
+      <div id="lwc"></div>
+      <!-- Crosshair tooltip -->
+      <div id="xhair">
+        <div class="xh-item"><div class="xh-label">Date</div><div class="xh-val" id="xh-date">—</div></div>
+        <div class="xh-item"><div class="xh-label">Time</div><div class="xh-val" id="xh-time">—</div></div>
+        <div class="xh-item"><div class="xh-label">O</div><div class="xh-val" id="xh-o">—</div></div>
+        <div class="xh-item"><div class="xh-label">H</div><div class="xh-val xh-green" id="xh-h">—</div></div>
+        <div class="xh-item"><div class="xh-label">L</div><div class="xh-val xh-red"   id="xh-l">—</div></div>
+        <div class="xh-item"><div class="xh-label">C</div><div class="xh-val" id="xh-c">—</div></div>
+        <div class="xh-item"><div class="xh-label">Chg%</div><div class="xh-val" id="xh-chg">—</div></div>
+      </div>
+      <!-- SuperTrend Debug Panel -->
+      <div id="st-debug">
+        <div class="xh-item"><div class="xh-label">ATR</div><div class="xh-val" id="st-atr">—</div></div>
+        <div class="xh-item"><div class="xh-label">Basic UB</div><div class="xh-val xh-red" id="st-bub">—</div></div>
+        <div class="xh-item"><div class="xh-label">Basic LB</div><div class="xh-val xh-green" id="st-blb">—</div></div>
+        <div class="xh-item"><div class="xh-label">Final UB</div><div class="xh-val xh-red" id="st-fub">—</div></div>
+        <div class="xh-item"><div class="xh-label">Final LB</div><div class="xh-val xh-green" id="st-flb">—</div></div>
+        <div class="xh-item"><div class="xh-label">Trend</div><div class="xh-val" id="st-dir">—</div></div>
+        <div class="xh-item"><div class="xh-label">ST Value</div><div class="xh-val" id="st-val">—</div></div>
+      </div>
+      <!-- Legend -->
+      <div id="legend"></div>
+    </div>
+    <!-- Sub-panel area -->
+    <div id="pane-area"></div>
+  </div>
+
+  <!-- REPLAY BAR (TradingView-style sleek) -->
+  <div id="replay-bar">
+    <button class="r-btn" id="btn-rst"  onclick="replay.reset()"    title="Reset (Home)">⏮</button>
+    <button class="r-btn" id="btn-bk"   onclick="replay.stepBack()" title="Back (←)">◀</button>
+    <button class="r-btn play" id="btn-play" onclick="replay.togglePlay()" title="Play/Pause (Space)">▶</button>
+    <button class="r-btn" id="btn-fwd"  onclick="replay.stepFwd()"  title="Forward (→)">▶|</button>
+    <button class="r-btn" id="btn-end"  onclick="replay.goEnd()"    title="End (End)">⏭</button>
+
+    <div class="r-sep"></div>
+
+    <input type="range" id="rslider" min="0" max="999" value="100" oninput="replay.scrubTo(this.value)" title="Replay position">
+
+    <div class="r-sep"></div>
+
+    <div class="spd-grp">
+      <span>Speed</span>
+      <input type="range" id="spd-slider" min="1" max="100" step="1" value="5" oninput="replay.setSpeed(this.value)" title="Playback speed (candles/sec)">
+      <span id="spd-lbl">5/s</span>
+    </div>
+
+    <div class="r-sep"></div>
+
+    <div id="status">Ready…</div>
+  </div>
+</div>
+
+<!-- INDICATOR LIBRARY POPUP -->
+<div class="overlay" id="ind-popup">
+  <div class="popup" style="width:510px;max-height:78vh">
+    <div class="pop-head">
+      <span class="pop-title">📊 Indicator Library</span>
+      <button class="pop-close" onclick="closePopup('ind-popup')">✕</button>
+    </div>
+    <input type="text" id="ind-search" placeholder="🔍  Search indicators…" oninput="filterInds(this.value)" autocomplete="off">
+    <div id="ind-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS POPUP -->
+<div class="overlay" id="set-popup">
+  <div class="popup" id="set-popup-inner">
+    <div class="pop-head">
+      <span class="pop-title" id="set-title">Settings</span>
+      <button class="pop-close" onclick="closePopup('set-popup')">✕</button>
+    </div>
+    <div class="set-form" id="set-form"></div>
+    <div class="pop-foot">
+      <button class="btn-cancel" onclick="closePopup('set-popup')">Cancel</button>
+      <button class="btn-ok" onclick="applySettings()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-logo">📈 NIFTY Replay <span class="setup-ver">v3</span></div>
+  <div class="setup-card">
+    <div class="setup-title">Replay Setup</div>
+    <div class="setup-sub">Select your replay parameters — no candle limit</div>
+
+    <div class="setup-row">
+      <div class="setup-lbl">Symbol</div>
+      <select class="setup-sel" id="setup-symbol">
+        <option value="NIFTY 50">NIFTY 50</option>
+      </select>
+    </div>
+
+    <div class="setup-row">
+      <div class="setup-lbl">Timeframe</div>
+      <select class="setup-sel" id="setup-tf">
+        <option value="1m">1 minute</option>
+        <option value="3m">3 minutes</option>
+        <option value="5m" selected>5 minutes</option>
+        <option value="15m">15 minutes</option>
+        <option value="30m">30 minutes</option>
+        <option value="45m">45 minutes</option>
+        <option value="1H">1 hour</option>
+        <option value="2H">2 hours</option>
+        <option value="4H">4 hours</option>
+        <option value="D">Daily</option>
+        <option value="W">Weekly</option>
+      </select>
+    </div>
+
+    <div class="setup-row">
+      <div class="setup-lbl">Start Date</div>
+      <input type="date" class="setup-inp" id="setup-start" value="2024-01-01">
+    </div>
+
+    <div class="setup-row">
+      <div class="setup-lbl">End Date</div>
+      <input type="date" class="setup-inp" id="setup-end" value="2024-06-01">
+    </div>
+
+    <button class="setup-btn" id="setup-load" onclick="loadReplay()">▶ Load Replay</button>
+    <div class="setup-info">Data will be filtered to your selected range</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// PERFORMANCE ENGINE v2 — Greenfield Rewrite
+// ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 1: CUSTOM CANVAS PRIMITIVES (unchanged API, optimized internals)
+// ───────────────────────────────────────────────────────────────────────────────
+
+class RectPrimitive {
+  constructor(chart, series, t1, topPrice, t2, botPrice, fill, stroke) {
+    this._c = chart; this._s = series;
+    this._t1 = t1; this._t2 = t2;
+    this._top = Math.max(topPrice, botPrice);
+    this._bot = Math.min(topPrice, botPrice);
+    this._fill = fill; this._stroke = stroke;
+    this._visible = true;
+  }
+  hide()     { this._visible = false; }
+  show()     { this._visible = true; }
+  setT2(t2)  { this._t2 = t2; }
+  setFill(f) { this._fill = f; }
+
+  updateAllViews() {}
+  paneViews()  { return [this]; }
+  renderer()   { return this; }
+  zOrder()     { return 'bottom'; }
+
+  draw(target) {
+    if (!this._visible) return;
+    target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr }) => {
+      const x1 = this._c.timeScale().timeToCoordinate(this._t1);
+      const x2 = this._c.timeScale().timeToCoordinate(this._t2);
+      const y1 = this._s.priceToCoordinate(this._top);
+      const y2 = this._s.priceToCoordinate(this._bot);
+      if (x1 == null || x2 == null || y1 == null || y2 == null) return;
+      const bx1 = Math.round(Math.min(x1,x2)*hr), bx2 = Math.round(Math.max(x1,x2)*hr);
+      const by1 = Math.round(Math.min(y1,y2)*vr), by2 = Math.round(Math.max(y1,y2)*vr);
+      const w = bx2-bx1, h = by2-by1;
+      if (w < 1 || h < 1) return;
+      ctx.fillStyle   = this._fill;    ctx.fillRect(bx1, by1, w, h);
+      ctx.strokeStyle = this._stroke;  ctx.lineWidth = hr;
+      ctx.strokeRect(bx1, by1, w, h);
+    });
+  }
+}
+
+class FibPrimitive {
+  constructor(chart, series, t1, p1, t2, p2) {
+    this._c = chart; this._s = series;
+    this._t1 = Math.min(t1,t2); this._t2 = Math.max(t1,t2);
+    this._high = Math.max(p1,p2); this._low = Math.min(p1,p2);
+  }
+  updateAllViews() {}
+  paneViews()  { return [this]; }
+  renderer()   { return this; }
+  zOrder()     { return 'normal'; }
+
+  draw(target) {
+    const LEVELS = [
+      {r:0,    lbl:'0%',    clr:'rgba(239,83,80,.95)'},
+      {r:.236, lbl:'23.6%', clr:'rgba(255,152,0,.95)'},
+      {r:.382, lbl:'38.2%', clr:'rgba(255,235,59,.95)'},
+      {r:.5,   lbl:'50%',   clr:'rgba(200,200,200,.8)'},
+      {r:.618, lbl:'61.8%', clr:'rgba(76,175,80,.95)'},
+      {r:.786, lbl:'78.6%', clr:'rgba(33,150,243,.95)'},
+      {r:1.0,  lbl:'100%',  clr:'rgba(156,39,176,.95)'},
+    ];
+    target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr, bitmapSize }) => {
+      const x1c = this._c.timeScale().timeToCoordinate(this._t1);
+      const x2c = this._c.timeScale().timeToCoordinate(this._t2);
+      if (x1c == null || x2c == null) return;
+      const bx1 = Math.round(Math.min(x1c,x2c)*hr);
+      const bx2 = Math.round(Math.max(x1c,x2c)*hr);
+      const range = this._high - this._low;
+
+      LEVELS.forEach(lv => {
+        const price = this._high - lv.r * range;
+        const yc = this._s.priceToCoordinate(price);
+        if (yc == null) return;
+        const by = Math.round(yc * vr);
+        ctx.beginPath(); ctx.moveTo(bx1, by); ctx.lineTo(bx2, by);
+        ctx.strokeStyle = lv.clr; ctx.lineWidth = hr;
+        ctx.setLineDash([5*hr, 4*hr]); ctx.stroke(); ctx.setLineDash([]);
+        const labelTxt = `${lv.lbl}  ${price.toFixed(2)}`;
+        ctx.font = `bold ${Math.round(9.5*vr)}px Inter,sans-serif`;
+        const tw = ctx.measureText(labelTxt).width;
+        ctx.fillStyle = 'rgba(13,17,23,.75)';
+        ctx.fillRect(bx1+4*hr, by-12*vr, tw+6*hr, 13*vr);
+        ctx.fillStyle = lv.clr;
+        ctx.fillText(labelTxt, bx1+7*hr, by-2*vr);
+      });
+    });
+  }
+}
+
+class LinePrimitive {
+  constructor(chart, series, t1, p1, t2, p2, color, isRay) {
+    this._c = chart; this._s = series;
+    this._t1 = t1; this._p1 = p1; this._t2 = t2; this._p2 = p2;
+    this._clr = color; this._ray = isRay;
+  }
+  updateAllViews() {}
+  paneViews()  { return [this]; }
+  renderer()   { return this; }
+  zOrder()     { return 'normal'; }
+
+  draw(target) {
+    target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr, bitmapSize }) => {
+      const ax = this._c.timeScale().timeToCoordinate(this._t1);
+      const bx = this._c.timeScale().timeToCoordinate(this._t2);
+      const ay = this._s.priceToCoordinate(this._p1);
+      const by_ = this._s.priceToCoordinate(this._p2);
+      if (ax==null||bx==null||ay==null||by_==null) return;
+      const x1b = Math.round(ax*hr), y1b = Math.round(ay*vr);
+      const x2b = Math.round(bx*hr), y2b = Math.round(by_*vr);
+      ctx.beginPath(); ctx.moveTo(x1b, y1b);
+      if (this._ray && x2b !== x1b) {
+        const slope = (y2b-y1b)/(x2b-x1b);
+        ctx.lineTo(bitmapSize.width, y1b + slope*(bitmapSize.width-x1b));
+      } else {
+        ctx.lineTo(x2b, y2b);
+      }
+      ctx.strokeStyle = this._clr; ctx.lineWidth = 1.5*hr; ctx.stroke();
+      [{ x:x1b,y:y1b},{x:x2b,y:y2b}].forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 3.5*hr, 0, Math.PI*2);
+        ctx.fillStyle = this._clr; ctx.fill();
+      });
+    });
+  }
+}
+
+class SuperTrendLinePrimitive {
+  constructor(chart, series) {
+    this._chart = chart;
+    this._series = series;
+    this._segments = [];
+  }
+
+  setData(times, stValues, dirValues) {
+    if (!times || !times.length) { this._segments = []; return; }
+    const segs = [];
+    let cur = null;
+    for (let i = 0; i < times.length; i++) {
+      const st  = stValues[i];
+      const dir = dirValues[i];
+      if (st == null || dir == null) continue;
+      if (!cur || cur.dir !== dir) {
+        if (cur) { segs.push(cur); }
+        cur = { dir, times: [], st: [] };
+      }
+      cur.times.push(times[i]);
+      cur.st.push(st);
+    }
+    if (cur) segs.push(cur);
+    this._segments = segs;
+    this._chart.applyOptions({});
+  }
+
+  updateAllViews() {}
+  paneViews()  { return [this]; }
+  renderer()   { return this; }
+  zOrder()     { return 'normal'; }
+
+  draw(target) {
+    if (!this._segments.length) return;
+    try {
+      target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr }) => {
+        const ts = this._chart.timeScale();
+        for (const seg of this._segments) {
+          const n = seg.times.length;
+          if (n < 2) continue;
+          const pts = [];
+          for (let i = 0; i < n; i++) {
+            const xc = ts.timeToCoordinate(seg.times[i]);
+            const yST = this._series.priceToCoordinate(seg.st[i]);
+            if (xc == null || yST == null) continue;
+            pts.push([Math.round(xc * hr), Math.round(yST * vr)]);
+          }
+          if (pts.length < 2) continue;
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let i = 1; i < pts.length; i++) {
+            ctx.lineTo(pts[i][0], pts[i-1][1]);
+            ctx.lineTo(pts[i][0], pts[i][1]);
+          }
+          ctx.strokeStyle = seg.dir === 1 ? '#22c55e' : '#ef4444';
+          ctx.lineWidth = 2.5 * hr;
+          ctx.lineJoin = 'miter';
+          ctx.stroke();
+        }
+      });
+    } catch (e) { console.error('[ST Line]', e); }
+  }
+}
+
+class SuperTrendFillPrimitive {
+  constructor(chart, series) {
+    this._chart = chart;
+    this._series = series;
+    this._segments = [];
+  }
+
+  setData(times, stValues, closeValues, dirValues) {
+    if (!times || !times.length) { this._segments = []; return; }
+    const segs = [];
+    let cur = null;
+    for (let i = 0; i < times.length; i++) {
+      const st  = stValues[i];
+      const cl  = closeValues[i];
+      const dir = dirValues[i];
+      if (st == null || cl == null || dir == null) continue;
+      if (!cur || cur.dir !== dir) {
+        if (cur) { segs.push(cur); }
+        cur = { dir, times: [], st: [], close: [] };
+      }
+      cur.times.push(times[i]);
+      cur.st.push(st);
+      cur.close.push(cl);
+    }
+    if (cur) segs.push(cur);
+    this._segments = segs;
+    this._chart.applyOptions({});
+  }
+
+  updateAllViews() {}
+  paneViews()  { return [this]; }
+  renderer()   { return this; }
+  zOrder()     { return 'bottom'; }
+
+  draw(target) {
+    if (!this._segments.length) return;
+    try {
+      target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr }) => {
+        const ts = this._chart.timeScale();
+        for (const seg of this._segments) {
+          const n = seg.times.length;
+          if (n < 2) continue;
+          const ptsST = [];
+          const ptsClose = [];
+          for (let i = 0; i < n; i++) {
+            const xc = ts.timeToCoordinate(seg.times[i]);
+            const yST = this._series.priceToCoordinate(seg.st[i]);
+            const yClose = this._series.priceToCoordinate(seg.close[i]);
+            if (xc == null || yST == null || yClose == null) continue;
+            ptsST.push([Math.round(xc * hr), Math.round(yST * vr)]);
+            ptsClose.push([Math.round(xc * hr), Math.round(yClose * vr)]);
+          }
+          if (ptsST.length < 2) continue;
+          ctx.beginPath();
+          ctx.moveTo(ptsST[0][0], ptsST[0][1]);
+          for (let i = 1; i < ptsST.length; i++) {
+            ctx.lineTo(ptsST[i][0], ptsST[i-1][1]);
+            ctx.lineTo(ptsST[i][0], ptsST[i][1]);
+          }
+          for (let i = ptsClose.length - 1; i >= 0; i--) {
+            ctx.lineTo(ptsClose[i][0], ptsClose[i][1]);
+          }
+          ctx.closePath();
+          ctx.fillStyle = seg.dir === 1 ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
+          ctx.fill();
+        }
+      });
+    } catch (e) { console.error('[ST Fill]', e); }
+  }
+}
+
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 2: STATE MANAGEMENT — Six Independent Systems
+// ───────────────────────────────────────────────────────────────────────────────
+
+const HistoricalStore = {
+  candles:  {},      // {tf: CandleArray}
+  zones:    {},      // {tf: ZoneArray}
+  loadedTFs: new Set(),
+
+  get(tf)      { return this.candles[tf]; },
+  getZones(tf) { return this.zones[tf]; },
+  isLoaded(tf) { return this.loadedTFs.has(tf); },
+
+  set(tf, candles, zones) {
+    this.candles[tf] = candles;
+    this.zones[tf] = zones;
+    this.loadedTFs.add(tf);
+  },
+
+  clear(tf) {
+    delete this.candles[tf];
+    delete this.zones[tf];
+    this.loadedTFs.delete(tf);
+  },
+
+  get length() {
+    const c = this.candles[currentTF];
+    return c ? c.length : 0;
+  }
+};
+
+const CursorStore = {
+  index: 100,
+  time:  0,
+
+  set(idx) {
+    const len = HistoricalStore.length;
+    this.index = Math.max(0, Math.min(idx, len - 1));
+    const c = HistoricalStore.get(currentTF);
+    this.time = c ? c[this.index]?.unixTime : 0;
+  },
+
+  advance(delta) {
+    this.set(this.index + delta);
+  }
+};
+
+const PlaybackStore = {
+  playing:   false,
+  speed:     5,        // candles per second
+  direction: 1,        // 1 = forward, -1 = backward
+  _rafId:    null,
+  _lastFrameTime: 0,
+  _accumulator: 0,
+  _framesSinceRender: 0,  // skip frames during fast playback to avoid freeze
+
+  get msPerCandle() { return 1000 / Math.max(1, this.speed); }
+};
+
+const ViewportStore = {
+  autoScroll: true,
+  // Always render from 0 to cursor — true replay mode, no sliding window
+  // This guarantees indicators always align perfectly with candle data
+
+  getRange(cursor) {
+    const len = HistoricalStore.length;
+    return { from: 0, to: Math.min(cursor, len - 1) };
+  }
+};
+
+const IndicatorStore = {
+  registry: [],        // indicator metadata from backend
+  active:   [],        // [{id, name, settings, ...}]
+  _nextId:  0,
+
+  // Pre-built caches: {indId: {byIndex: [], byTime: []}}
+  _caches: new Map(),
+
+  getCache(indId) { return this._caches.get(indId); },
+  setCache(indId, cache) { this._caches.set(indId, cache); },
+  clearCache(indId) { this._caches.delete(indId); },
+  clearAllCaches() { this._caches.clear(); }
+};
+
+const ZoneStore = {
+  // Pre-built timeline: {tf: [{cursor, zones: [{prim, zone, startIdx, endIdx, isMit}]}]}
+  _timelines: {},
+
+  getTimeline(tf) { return this._timelines[tf]; },
+  setTimeline(tf, timeline) { this._timelines[tf] = timeline; },
+  clearTimeline(tf) { delete this._timelines[tf]; },
+
+  // Pre-built primitive list for current TF
+  _prims: [],
+  getPrimitives() { return this._prims; },
+  setPrimitives(prims) {
+    this._prims.forEach(p => { try { cSeries.detachPrimitive(p.prim); } catch(e){} });
+    this._prims = prims;
+  }
+};
+
+const DrawingStore = {
+  tool: 'cursor',
+  state: null,     // {step:1, t1, p1}
+  preview: null,
+  items: [],       // [{type, prim|pl|series}]
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 3: PLAYBACK CONTROLLER — requestAnimationFrame + Frame Budget
+// ───────────────────────────────────────────────────────────────────────────────
+
+const replay = {
+  togglePlay() {
+    PlaybackStore.playing ? this.pause() : this.play();
+  },
+  reset()    { CursorStore.set(0); ChartEngine.seek(); IndicatorEngine.seek(); UIController.update(); },
+  stepBack() { if (CursorStore.index > 0) { CursorStore.set(CursorStore.index - 1); ChartEngine.tick(); IndicatorEngine.tick(); UIController.update(); } },
+  stepFwd()  { if (CursorStore.index < HistoricalStore.length - 1) { CursorStore.set(CursorStore.index + 1); ChartEngine.tick(); IndicatorEngine.tick(); UIController.update(); } },
+  goEnd()    { CursorStore.set(HistoricalStore.length - 1); ChartEngine.seek(); IndicatorEngine.seek(); UIController.update(); },
+  scrubTo(v) { CursorStore.set(parseInt(v)); ChartEngine.seek(); IndicatorEngine.seek(); UIController.update(); },
+  setSpeed(v) { PlaybackStore.speed = parseInt(v); document.getElementById('spd-lbl').textContent = v + '/s'; },
+
+  play() {
+    if (PlaybackStore.playing) return;
+    if (CursorStore.index >= HistoricalStore.length - 1) {
+      CursorStore.set(0);
+      ChartEngine.refresh();
+    }
+    PlaybackStore.playing = true;
+    PlaybackStore._lastFrameTime = performance.now();
+    PlaybackStore._framesSinceRender = 0;
+    PlaybackStore._accumulator = 0;
+    this._updatePlayButton(true);
+    PlaybackStore._rafId = requestAnimationFrame(t => this._loop(t));
+  },
+
+  pause() {
+    if (!PlaybackStore.playing) return;
+    PlaybackStore.playing = false;
+    if (PlaybackStore._rafId) cancelAnimationFrame(PlaybackStore._rafId);
+    PlaybackStore._rafId = null;
+    // Final sync: ensure chart shows exact cursor position
+    ChartEngine.seek();
+    IndicatorEngine.seek();
+    UIController.update();
+    this._updatePlayButton(false);
+  },
+
+  _loop(timestamp) {
+    if (!PlaybackStore.playing) return;
+
+    const dt = timestamp - PlaybackStore._lastFrameTime;
+    PlaybackStore._lastFrameTime = timestamp;
+    PlaybackStore._accumulator += dt;
+
+    const msPerCandle = PlaybackStore.msPerCandle;
+    const candlesToAdvance = Math.floor(PlaybackStore._accumulator / msPerCandle);
+
+    if (candlesToAdvance > 0) {
+      PlaybackStore._accumulator -= candlesToAdvance * msPerCandle;
+      const newIndex = CursorStore.index + candlesToAdvance * PlaybackStore.direction;
+      const maxIdx = HistoricalStore.length - 1;
+
+      if (newIndex >= maxIdx) {
+        CursorStore.set(maxIdx);
+        this.pause();
+      } else {
+        CursorStore.set(newIndex);
+      }
+
+      // Skip frames during fast playback to avoid setData freeze
+      // At speed <= 10: render every frame (update() is fast)
+      // At speed > 10: render every 2nd frame
+      // At speed > 50: render every 4th frame
+      const skipFrames = PlaybackStore.speed > 50 ? 4 : (PlaybackStore.speed > 10 ? 2 : 1);
+      PlaybackStore._framesSinceRender++;
+      if (PlaybackStore._framesSinceRender >= skipFrames) {
+        PlaybackStore._framesSinceRender = 0;
+        ChartEngine.seek();
+        IndicatorEngine.seek();
+        UIController.throttledUpdate();
+      }
+    }
+
+    if (PlaybackStore.playing) {
+      PlaybackStore._rafId = requestAnimationFrame(t => this._loop(t));
+    }
+  },
+
+  // Duplicate methods removed — defined above at object start
+
+  scrubTo(val) {
+    this.pause();
+    CursorStore.set(parseInt(val));
+    ChartEngine.seek();
+    IndicatorEngine.seek();
+    // ZoneEngine.seek();
+    UIController.update();
+  },
+
+  setSpeed(val) {
+    PlaybackStore.speed = parseInt(val);
+    const lbl = document.getElementById('spd-lbl');
+    if (lbl) lbl.textContent = PlaybackStore.speed + '/s';
+    // Restart if playing to apply new speed immediately
+    if (PlaybackStore.playing) {
+      this.pause();
+      this.play();
+    }
+  },
+
+  _updatePlayButton(playing) {
+    const b = document.getElementById('btn-play');
+    if (!b) return;
+    if (playing) {
+      b.textContent = '⏸';
+      b.className = 'r-btn pause';
+    } else {
+      b.textContent = '▶';
+      b.className = 'r-btn play';
+    }
+  }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 4: CHART ENGINE — Incremental Updates, Viewport Virtualization
+// ───────────────────────────────────────────────────────────────────────────────
+
+let chart = null;
+let cSeries = null;
+
+const ChartEngine = {
+  _lastRenderedIndex: -1,
+  _lastRange: null,
+
+  init() {
+    const el = document.getElementById('lwc');
+    chart = LightweightCharts.createChart(el, {
+      layout:  { background:{color:'#0d1117'}, textColor:'#787b86', fontFamily:"'Inter',sans-serif", fontSize:11 },
+      grid:    { vertLines:{color:'rgba(255,255,255,0.03)'}, horzLines:{color:'rgba(255,255,255,0.03)'} },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal,
+                   vertLine:{color:'#444',width:1,style:1,labelBackgroundColor:'#2a2e39'},
+                   horzLine:{color:'#444',width:1,style:1,labelBackgroundColor:'#2a2e39'} },
+      rightPriceScale: { borderColor:'#2e3347' },
+      timeScale:       { borderColor:'#2e3347', timeVisible:true, secondsVisible:false, barSpacing:7 },
+      handleScroll:    { mouseWheel:true, pressedMouseMove:true, horzTouchDrag:true },
+      handleScale:     { mouseWheel:true, pinch:true },
+    });
+
+    cSeries = chart.addCandlestickSeries({
+      upColor:'#00B050', downColor:'#FF3A3A',
+      borderUpColor:'#00B050', borderDownColor:'#FF3A3A',
+      wickUpColor:'#00B050', wickDownColor:'#FF3A3A',
+      priceLineVisible:false,
+    });
+
+    chart.subscribeCrosshairMove(onXhair);
+    chart.subscribeClick(onChartClick);
+    chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
+      // User scrolled — disable auto-scroll so they can explore
+      ViewportStore.autoScroll = false;
+    });
+
+    new ResizeObserver(() =>
+      chart.applyOptions({ width:el.clientWidth, height:el.clientHeight })
+    ).observe(el);
+  },
+
+  // Called on every tick during playback — O(1) incremental
+  tick() {
+    const cursor = CursorStore.index;
+    const candles = HistoricalStore.get(currentTF);
+    if (!candles) return;
+
+    // If cursor jumped backwards or by more than 1, do a seek instead
+    if (cursor <= this._lastRenderedIndex || cursor > this._lastRenderedIndex + 1) {
+      this.seek();
+      return;
+    }
+
+    // Incremental: only append the new candle
+    const candle = candles[cursor];
+    cSeries.update({
+      time: candle.unixTime,
+      open: candle.open,
+      high: candle.high,
+      low: candle.low,
+      close: candle.close
+    });
+
+    this._lastRenderedIndex = cursor;
+
+    // Auto-scroll viewport
+    if (ViewportStore.autoScroll) {
+      this._smoothScroll();
+    }
+  },
+
+  // Called on seek — show all candles from 0..cursor (true replay, no blank left side)
+  seek() {
+    const cursor = CursorStore.index;
+    const candles = HistoricalStore.get(currentTF);
+    if (!candles) return;
+
+    const { from, to } = ViewportStore.getRange(cursor);
+    const visible = candles.slice(from, to + 1);
+    cSeries.setData(visible.map(c => ({
+      time: c.unixTime, open: c.open, high: c.high, low: c.low, close: c.close
+    })));
+
+    this._lastRenderedIndex = cursor;
+    this._lastRange = { from, to };
+
+    if (ViewportStore.autoScroll) {
+      // Scroll to latest candle — no negative logical range issues
+      try { chart.timeScale().scrollToRealTime(); } catch(e) {}
+    }
+  },
+
+  // Full refresh — used on init, TF switch, etc.
+  refresh() {
+    this.seek();
+  },
+
+  _smoothScroll() {
+    // Scroll one bar to the right to keep latest candle visible
+    const ts = chart.timeScale();
+    try { ts.scrollToRealTime(); } catch(e) {}
+  },
+
+  destroy() {
+    if (chart) {
+      chart.remove();
+      chart = null;
+      cSeries = null;
+    }
+    this._lastRenderedIndex = -1;
+  }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 5: INDICATOR ENGINE — Pre-built Caches, O(1) Lookup
+// ───────────────────────────────────────────────────────────────────────────────
+
+const IndicatorEngine = {
+  // Called once after indicator is computed — pre-build per-index caches
+  buildCache(ind) {
+    const fd = ind._fullData;
+    if (!fd || !fd.rawTimes) return;
+
+    const cache = {
+      byIndex: [],      // cache.byIndex[cursor] = {lwcData, primData}
+    };
+
+    const times = fd.rawTimes;
+    const len = times.length;
+
+    // Pre-compute visible data for every cursor position
+    const seriesKeys = Object.keys(ind._lwcSeries || {}).filter(k => k !== 'bull' && k !== 'bear');
+    
+    // Simple approach: for each cursor, slice data up to cursor index
+    // This works because indicator values align 1:1 with candles
+    for (let cursor = 0; cursor < len; cursor++) {
+      const entry = {};
+
+      seriesKeys.forEach(key => {
+        const arr = fd[key];
+        if (!arr) return;
+        entry[key] = arr.slice(0, cursor + 1);
+      });
+
+      // Markers
+      if (fd.bullMarkers) entry.bullMarkers = fd.bullMarkers.filter(m => m.time <= times[cursor]);
+      if (fd.bearMarkers) entry.bearMarkers = fd.bearMarkers.filter(m => m.time <= times[cursor]);
+
+      // Primitive data (for SuperTrend line + fill)
+      if (fd.rawST) {
+        entry.primST = fd.rawST.slice(0, cursor + 1);
+        entry.primDir = fd.rawDir.slice(0, cursor + 1);
+        entry.primTimes = fd.rawTimes.slice(0, cursor + 1);
+
+        // Close prices for fill
+        const candles = HistoricalStore.get(currentTF);
+        const closeMap = {};
+        if (candles) candles.forEach(c => { closeMap[c.unixTime] = c.close; });
+        entry.primClose = entry.primTimes.map(t => closeMap[t] ?? null);
+      }
+
+      cache.byIndex[cursor] = entry;
+    }
+
+    IndicatorStore.setCache(ind.id, cache);
+  },
+
+  // Called on every tick — O(1) lookup
+  tick() {
+    const cursor = CursorStore.index;
+    IndicatorStore.active.forEach(ind => {
+      if (ind._isZones) {
+        renderZoneBasedInd(ind, CursorStore.time);
+        return;
+      }
+      this._renderIndAtCursor(ind, cursor);
+    });
+  },
+
+  // Called on seek
+  seek() {
+    this.tick();
+  },
+
+  _renderIndAtCursor(ind, cursor) {
+    const cache = IndicatorStore.getCache(ind.id);
+    if (!cache) return;
+
+    const data = cache.byIndex[cursor];
+    if (!data) return;
+
+    // Viewport is 0..cursor, so ALL indicator points up to cursor are in range
+    // No minTime filtering needed — everything aligns perfectly
+    if (ind.overlay) {
+      Object.entries(ind._lwcSeries || {}).forEach(([key, s]) => {
+        const pts = data[key];
+        if (pts && pts.length) {
+          s.setData(pts);
+        }
+      });
+
+      // Markers
+      if (ind._lwcSeries.bull && data.bullMarkers) {
+        ind._lwcSeries.bull.setMarkers(data.bullMarkers);
+      }
+      if (ind._lwcSeries.bear && data.bearMarkers) {
+        ind._lwcSeries.bear.setMarkers(data.bearMarkers);
+      }
+
+      // SuperTrend primitives
+      if (ind._stLinePrim && data.primTimes) {
+        ind._stLinePrim.setData(data.primTimes, data.primST, data.primDir);
+      }
+      if (ind._fillPrim && data.primTimes) {
+        ind._fillPrim.setData(data.primTimes, data.primST, data.primClose, data.primDir);
+      }
+    } else if (ind._paneChart) {
+      Object.entries(ind._paneSeries || {}).forEach(([key, s]) => {
+        const pts = data[key];
+        if (pts && pts.length) {
+          s.setData(pts);
+        }
+      });
+    }
+  }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 6: ZONE ENGINE — Pre-built Timeline, O(1) Lookup
+// ───────────────────────────────────────────────────────────────────────────────
+
+const ZoneEngine = {
+  // Build zone visibility timeline once per TF — O(n×z)
+  buildTimeline(tf) {
+    const zones = HistoricalStore.getZones(tf);
+    const candles = HistoricalStore.get(tf);
+    if (!zones || !candles) return;
+
+    const timeline = [];
+
+    for (let cursor = 0; cursor < candles.length; cursor++) {
+      const visible = [];
+      const dtToIdx = {};
+      for (let i = 0; i <= cursor; i++) {
+        dtToIdx[candles[i].datetime] = i;
+      }
+
+      for (const zone of zones) {
+        const cTime = zone.creation_datetime;
+        if (!(cTime in dtToIdx)) continue;
+
+        const startIdx = dtToIdx[cTime];
+        const mTime = zone.mitigation_datetime;
+        const isMit = mTime !== 'Active' && mTime in dtToIdx;
+        const endIdx = isMit ? dtToIdx[mTime] : cursor;
+
+        visible.push({ zone, startIdx, endIdx, isMit });
+      }
+
+      timeline[cursor] = visible;
+    }
+
+    ZoneStore.setTimeline(tf, timeline);
+  },
+
+  // Create persistent primitives once
+  initPrimitives(tf) {
+    const zones = HistoricalStore.getZones(tf);
+    if (!zones) return;
+
+    // Limit to most significant zones to prevent visual clutter
+    // Sort by gap size (largest first) and take top 100
+    const sortedZones = zones
+      .map(z => ({ ...z, _gapSize: Math.abs(z.top_price - z.bottom_price) }))
+      .sort((a, b) => b._gapSize - a._gapSize)
+      .slice(0, 100);
+
+    ZoneStore.setPrimitives(
+      sortedZones.map(zone => {
+        const prim = new RectPrimitive(
+          chart, cSeries,
+          0, zone.top_price,
+          0, zone.bottom_price,
+          'rgba(38,166,154,0.15)', 'rgba(38,166,154,0.7)'
+        );
+        prim.hide();
+        cSeries.attachPrimitive(prim);
+        return { prim, zone };
+      })
+    );
+  },
+
+  // O(1) lookup on tick
+  tick() {
+    this._updateAtCursor(CursorStore.index);
+  },
+
+  seek() {
+    this._updateAtCursor(CursorStore.index);
+  },
+
+  _updateAtCursor(cursor) {
+    const visible = HistoricalStore.get(currentTF);
+    if (!visible || !visible.length) return;
+
+    const timeline = ZoneStore.getTimeline(currentTF);
+    if (!timeline) return;
+
+    const zonesAtCursor = timeline[cursor];
+    if (!zonesAtCursor) {
+      ZoneStore.getPrimitives().forEach(({ prim }) => prim.hide());
+      return;
+    }
+
+    // Build a set of zone IDs that should be visible
+    const visibleZoneIds = new Set(zonesAtCursor.map(z => z.zone.imbalance_id));
+
+    ZoneStore.getPrimitives().forEach(({ prim, zone }) => {
+      const match = zonesAtCursor.find(z => z.zone.imbalance_id === zone.imbalance_id);
+      if (!match) { prim.hide(); return; }
+
+      prim.show();
+      prim._t1 = visible[match.startIdx].unixTime;
+      prim._t2 = visible[match.endIdx].unixTime;
+      prim._top = zone.top_price;
+      prim._bot = zone.bottom_price;
+
+      const isBull = zone.imbalance_type === 'bullish';
+      if (isBull) {
+        prim._fill   = match.isMit ? 'rgba(38,166,154,0.07)' : 'rgba(38,166,154,0.16)';
+        prim._stroke = 'rgba(38,166,154,0.8)';
+      } else {
+        prim._fill   = match.isMit ? 'rgba(239,83,80,0.07)'  : 'rgba(239,83,80,0.16)';
+        prim._stroke = 'rgba(239,83,80,0.8)';
+      }
+    });
+  }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 7: UI CONTROLLER — Throttled Updates
+// ───────────────────────────────────────────────────────────────────────────────
+
+const UIController = {
+  _pending: false,
+  _lastUpdate: 0,
+  _throttleMs: 50,  // Update UI at most every 50ms during playback
+
+  throttledUpdate() {
+    if (this._pending) return;
+    const now = performance.now();
+    if (now - this._lastUpdate < this._throttleMs) return;
+
+    this._pending = true;
+    requestAnimationFrame(() => {
+      this.update();
+      this._pending = false;
+      this._lastUpdate = performance.now();
+    });
+  },
+
+  update() {
+    const visible = HistoricalStore.get(currentTF);
+    if (!visible || !visible.length) return;
+
+    const cursor = CursorStore.index;
+    const c = visible[cursor];
+    const p = visible[Math.max(0, cursor - 1)];
+
+    // Status bar
+    const chg = ((c.close - p.close) / p.close * 100).toFixed(2);
+    const sign = c.close >= p.close ? '+' : '';
+    const statusEl = document.getElementById('status');
+    if (statusEl) {
+      statusEl.textContent =
+        `${c.datetime.slice(0,10)}  ${c.datetime.slice(11,16)}  ` +
+        `O:${c.open}  H:${c.high}  L:${c.low}  C:${c.close}  ` +
+        `${sign}${chg}%  #${cursor + 1}/${visible.length}`;
+    }
+
+    // Slider
+    const slider = document.getElementById('rslider');
+    if (slider) slider.value = cursor;
+
+    // ST Debug panel
+    if (_stDebugOn) this._updateSTDebug();
+  },
+
+  _updateSTDebug() {
+    const stInd = IndicatorStore.active.find(ind => ind.name === 'SuperTrend');
+    if (!stInd?._fullData) return;
+    const fd = stInd._fullData;
+    const idx = CursorStore.index;
+    if (idx < 0 || idx >= fd.rawST.length) return;
+
+    const dir = fd.rawDir[idx];
+    document.getElementById('st-atr').textContent = (fd.rawATR?.[idx] ?? '—').toString();
+    document.getElementById('st-bub').textContent = (fd.rawBUB?.[idx] ?? '—').toString();
+    document.getElementById('st-blb').textContent = (fd.rawBLB?.[idx] ?? '—').toString();
+    document.getElementById('st-fub').textContent = (fd.rawFUB?.[idx] ?? '—').toString();
+    document.getElementById('st-flb').textContent = (fd.rawFLB?.[idx] ?? '—').toString();
+    document.getElementById('st-dir').textContent = dir === 1 ? 'BULL' : 'BEAR';
+    document.getElementById('st-dir').className = 'xh-val ' + (dir === 1 ? 'xh-green' : 'xh-red');
+    document.getElementById('st-val').textContent = (fd.rawST?.[idx] ?? '—').toString();
+  }
+};
+
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 8: DATA LOADING — Fetch Once, Replay Local
+// ───────────────────────────────────────────────────────────────────────────────
+
+let currentTF = '5m';
+let _stDebugOn = false;
+
+let _replayRange = { start: null, end: null };
+
+async function init() {
+  console.log('[ReplayEngine] init() v3 — setup screen mode');
+  txt('Connecting to backend…');
+  await loadRegistry();
+  bindKeys();
+  document.getElementById('loading').style.display = 'none';
+  // Show setup screen — chart loads ONLY after user clicks "Load Replay"
+  document.getElementById('setup-screen').classList.remove('hidden');
+}
+
+async function loadReplay() {
+  const btn = document.getElementById('setup-load');
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+
+  const tf = document.getElementById('setup-tf').value;
+  const start = document.getElementById('setup-start').value;
+  const end = document.getElementById('setup-end').value;
+
+  currentTF = tf;
+
+  // If range changed for already-loaded TF, clear cache to force re-fetch
+  if (HistoricalStore.isLoaded(tf)) {
+    const prev = HistoricalStore.get(tf);
+    if (prev && prev.length > 0) {
+      const first = prev[0].datetime.slice(0,10);
+      const last  = prev[prev.length-1].datetime.slice(0,10);
+      if (first !== start || last !== end) {
+        console.log('[ReplayEngine] Range changed, clearing cache:', tf, first+'→'+last, 'to', start+'→'+end);
+        HistoricalStore.clear(tf);
+      }
+    }
+  }
+
+  _replayRange = { start, end };
+
+  // Update TF buttons
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.toggle('active', b.dataset.tf === tf));
+
+  txt('Creating chart engine…');
+  ChartEngine.init();
+
+  txt(`Loading ${tf} data…`);
+  await preload(tf, start, end);
+
+  if (HistoricalStore.length === 0) {
+    showToast('⚠️ No data found for selected range');
+    btn.disabled = false;
+    btn.textContent = '▶ Load Replay';
+    return;
+  }
+
+  txt('Building replay caches…');
+  buildAllCaches();
+
+  txt('Rendering…');
+  CursorStore.set(Math.min(100, HistoricalStore.length - 1));
+  ChartEngine.seek();
+  // ZoneEngine.tick();
+  IndicatorEngine.seek();
+  UIController.update();
+
+  // Hide setup, show chart
+  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('loading').style.display = 'none';
+
+  restoreLayout();
+  fitChart();
+  showToast('✅ Replay ready — ' + (HistoricalStore.length).toLocaleString() + ' candles');
+}
+
+function txt(s) { document.getElementById('loading-text').textContent = s; }
+
+async function preload(tf, start, end) {
+  if (HistoricalStore.isLoaded(tf)) {
+    // Already loaded with correct range
+    const sl = document.getElementById('rslider');
+    if (sl) sl.max = HistoricalStore.length - 1;
+    return;
+  }
+
+  txt('Loading ' + tf + ' candles…');
+  try {
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://allen-sheer-exhibits-coordination.trycloudflare.com';
+    const dateQ = [];
+    if (start) dateQ.push(`start=${start}`);
+    if (end) dateQ.push(`end=${end}`);
+    const q = dateQ.length ? '&' + dateQ.join('&') : '';
+
+    // Fetch candles with date range filter
+    const r = await fetch(`${apiUrl}/api/candles?tf=${tf}${q}&limit=0`);
+    const d = await r.json();
+    const candles = d.candles.map(c => ({ ...c, unixTime: ist2unix(c.datetime) }));
+
+    // Fetch zones
+    const zr = await fetch(`${apiUrl}/api/imbalances?tf=${tf}${q}`);
+    const zd = await zr.json();
+    const zones = zd.zones || [];
+
+    HistoricalStore.set(tf, candles, zones);
+
+    // Update slider max
+    const sl = document.getElementById('rslider');
+    if (sl) { sl.max = candles.length - 1; sl.value = Math.min(100, candles.length - 1); }
+
+    // Build zone timeline
+    // Zones disabled
+    // ZoneEngine.buildTimeline(tf);
+    // ZoneEngine.initPrimitives(tf);
+
+    txt('Caches built.');
+
+  } catch(e) {
+    showToast('⚠️ Load error: ' + e.message);
+  }
+}
+
+function buildAllCaches() {
+  IndicatorStore.active.forEach(ind => {
+    IndicatorEngine.buildCache(ind);
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 9: INDICATOR FRAMEWORK
+// ───────────────────────────────────────────────────────────────────────────────
+
+async function loadRegistry() {
+  try {
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://allen-sheer-exhibits-coordination.trycloudflare.com';
+    IndicatorStore.registry = await (await fetch(apiUrl + '/api/indicators/list')).json();
+    buildIndUI();
+  } catch(e) { console.error('Registry load failed:', e); }
+}
+
+const IND_CATS = {
+  'Trend':       ['EMA','SMA','WMA','HMA','VWAP','SuperTrend'],
+  'Momentum':    ['RSI','MACD','Stochastic','CCI'],
+  'Volatility':  ['ATR','Bollinger Bands','Keltner Channels'],
+  'Volume':      ['OBV'],
+  'Smart Money': ['FVG','Order Blocks','Imbalance Zones'],
+};
+
+function buildIndUI() {
+  const list = document.getElementById('ind-list');
+  list.innerHTML = '';
+  for (const [cat, names] of Object.entries(IND_CATS)) {
+    const h = document.createElement('div'); h.className='ind-cat'; h.textContent=cat;
+    list.appendChild(h);
+    names.forEach(name => {
+      const m = IndicatorStore.registry.find(r=>r.name===name); if(!m) return;
+      const row = document.createElement('div'); row.className='ind-row'; row.dataset.name=name;
+      row.innerHTML = `
+        <span class="badge ${m.overlay?'b-ovl':'b-pane'}">${m.overlay?'OVL':'PANE'}</span>
+        <div><div class="ind-name">${name}</div><div class="ind-desc">${m.description||''}</div></div>
+        <button class="add-btn" onclick="addInd('${name}')">+ Add</button>`;
+      list.appendChild(row);
+    });
+  }
+}
+
+function filterInds(q) {
+  const lq = q.toLowerCase();
+  document.querySelectorAll('.ind-row').forEach(el => {
+    el.style.display = el.dataset.name.toLowerCase().includes(lq)?'':'none';
+  });
+  document.querySelectorAll('.ind-cat').forEach(el => {
+    let n = el.nextElementSibling, any=false;
+    while(n && !n.classList.contains('ind-cat')){ if(n.style.display!=='none') any=true; n=n.nextElementSibling; }
+    el.style.display = any?'':'none';
+  });
+}
+
+async function addInd(name) {
+  closePopup('ind-popup');
+  const meta = IndicatorStore.registry.find(r=>r.name===name); if(!meta) return;
+  const id = ++IndicatorStore._nextId;
+  const settings = {};
+  meta.schema.forEach(f => settings[f.key]=f.default);
+  const ind = {
+    id, name, settings, overlay:meta.overlay, pane:meta.pane,
+    schema:meta.schema, _lwcSeries:{}, _paneSeries:{}, _paneStaticSeries:[]
+  };
+  IndicatorStore.active.push(ind);
+  showToast('Computing ' + name + '…');
+  await computeFull(ind);
+  if (ind.overlay) createOverlaySeries(ind);
+  else createPaneSeries(ind);
+
+  // Build cache and render
+  IndicatorEngine.buildCache(ind);
+  IndicatorEngine._renderIndAtCursor(ind, CursorStore.index);
+
+  buildLegend();
+  saveLayout();
+  showToast('✅ ' + name + ' added');
+}
+
+async function computeFull(ind) {
+  try {
+    const apiUrl = window.parent.NEXT_PUBLIC_API_URL || 'https://allen-sheer-exhibits-coordination.trycloudflare.com';
+    const body = { indicator:ind.name, settings:ind.settings, tf:currentTF };
+    if (_replayRange.start) body.start = _replayRange.start;
+    if (_replayRange.end)   body.end = _replayRange.end;
+    const resp = await fetch(apiUrl + '/api/indicators/calculate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    const j = await resp.json();
+    if (!j.ok) { showToast('⚠️ '+j.error); return; }
+    const data = j.result.data;
+    ind._resultMeta = data;
+    const cache = HistoricalStore.get(currentTF);
+    if (!cache) return;
+    const times = cache.map(c=>c.unixTime);
+    ind._fullData = buildFullData(ind.name, data, times);
+  } catch(e) { showToast('⚠️ '+e.message); }
+}
+
+function buildFullData(name, data, times) {
+  // Safety: trim indicator arrays to match candle count to prevent time=undefined errors
+  const safeSlice = arr => Array.isArray(arr) ? arr.slice(0, times.length) : [];
+  const mk = arr => safeSlice(arr).map((v,i) => v!=null && times[i]!=null ? {time:times[i],value:v} : null).filter(Boolean);
+  if (name==='MACD')       return { rawTimes: times, macd:mk(data.macd), signal:mk(data.signal), hist:(data.histogram||[]).map((v,i)=>v!=null?{time:times[i],value:v,color:v>=0?data.bull_color:data.bear_color}:null).filter(Boolean) };
+  if (name==='Stochastic') return { rawTimes: times, k:mk(data.k), d:mk(data.d) };
+  if (name==='Bollinger Bands'||name==='Keltner Channels') return { rawTimes: times, upper:mk(data.upper), basis:mk(data.basis), lower:mk(data.lower) };
+  if (name==='VWAP')       return { rawTimes: times, main:mk(data.values), upper:mk(data.upper), lower:mk(data.lower) };
+
+  if (name==='SuperTrend') {
+    const bullMarkers=[], bearMarkers=[];
+    let prevDir = null;
+    const showMarkers = data.show_markers !== false;
+
+    (data.values||[]).forEach((v,i) => {
+      if (v == null) return;
+      const dir = data.direction[i];
+      const t   = times[i];
+      if (showMarkers && prevDir !== null && prevDir !== dir) {
+        if (dir === 1) {
+          bullMarkers.push({ time: t, position: 'belowBar', color: '#22c55e', shape: 'arrowUp', text: '▲ Buy', size: 1 });
+        } else {
+          bearMarkers.push({ time: t, position: 'aboveBar', color: '#ef4444', shape: 'arrowDown', text: '▼ Sell', size: 1 });
+        }
+      }
+      prevDir = dir;
+    });
+
+    return {
+      bullMarkers, bearMarkers,
+      rawTimes: times,
+      rawST: data.values,
+      rawDir: data.direction,
+      rawATR: data.atr || [],
+      rawFUB: data.final_upper || [],
+      rawFLB: data.final_lower || [],
+      rawBUB: data.basic_upper || [],
+      rawBLB: data.basic_lower || [],
+    };
+  }
+
+  if (name==='FVG'||name==='Order Blocks'||name==='Imbalance Zones') return { rawTimes: times, zones: data.zones||[] };
+  return { rawTimes: times, main: mk(data.values) };
+}
+
+function createOverlaySeries(ind) {
+  Object.values(ind._lwcSeries||{}).forEach(s=>{ try{chart.removeSeries(s);}catch(e){} });
+  ind._lwcSeries = {};
+  const d = ind._resultMeta||{};
+  const n = ind.name;
+
+  if (n==='Bollinger Bands'||n==='Keltner Channels') {
+    const bc = d.band_color||'rgba(33,150,243,.5)';
+    ind._lwcSeries.upper = chart.addLineSeries({color:bc,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    ind._lwcSeries.basis = chart.addLineSeries({color:d.color||'#9E9E9E',lineWidth:1,priceLineVisible:false,lastValueVisible:true});
+    ind._lwcSeries.lower = chart.addLineSeries({color:bc,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    ind._color = d.color||'#9E9E9E';
+  } else if (n==='VWAP') {
+    ind._lwcSeries.main = chart.addLineSeries({color:d.color||'#FFEB3B',lineWidth:d.width||2,priceLineVisible:false,lastValueVisible:true});
+    if (d.show_bands) {
+      const bc=d.band_color||'rgba(255,235,59,.3)';
+      ind._lwcSeries.upper = chart.addLineSeries({color:bc,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+      ind._lwcSeries.lower = chart.addLineSeries({color:bc,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    }
+    ind._color = d.color||'#FFEB3B';
+  } else if (n==='SuperTrend') {
+    const bullClr = d.bull_color || '#22c55e';
+    const bearClr = d.bear_color || '#ef4444';
+    ind._color = bullClr;
+    ind._stLinePrim = new SuperTrendLinePrimitive(chart, cSeries);
+    cSeries.attachPrimitive(ind._stLinePrim);
+    ind._fillPrim = new SuperTrendFillPrimitive(chart, cSeries);
+    cSeries.attachPrimitive(ind._fillPrim);
+    ind._lwcSeries.bull = chart.addLineSeries({
+      color: bullClr, lineWidth: 0,
+      priceLineVisible: false, lastValueVisible: false,
+      crosshairMarkerVisible: false,
+    });
+    ind._lwcSeries.bear = chart.addLineSeries({
+      color: bearClr, lineWidth: 0,
+      priceLineVisible: false, lastValueVisible: false,
+      crosshairMarkerVisible: false,
+    });
+  } else if (n==='FVG'||n==='Order Blocks'||n==='Imbalance Zones') {
+    ind._color = n==='FVG'?'#ff9800':(n==='Order Blocks'?'#9c27b0':'#2196F3');
+    ind._isZones = true;
+    ind._zonePrims = [];
+  } else {
+    const clr = d.color||'#2196F3';
+    ind._lwcSeries.main = chart.addLineSeries({color:clr,lineWidth:d.width||2,priceLineVisible:false,lastValueVisible:true});
+    ind._color = clr;
+  }
+}
+
+let _paneId = 0;
+function createPaneSeries(ind) {
+  const d = ind._resultMeta||{};
+  const pid = 'p' + (++_paneId);
+  const pEl = document.createElement('div');
+  pEl.className='ind-pane'; pEl.id='dom-'+pid; pEl.style.height='145px';
+  pEl.innerHTML=`<div class="pane-lbl">${d.label||ind.name}</div>
+    <button class="pane-x" onclick="removePaneInd('${pid}',${ind.id})">✕</button>
+    <div class="pane-chart-div" id="lwc-${pid}"></div>`;
+  document.getElementById('pane-area').appendChild(pEl);
+
+  const pDiv = document.getElementById('lwc-'+pid);
+  const pChart = LightweightCharts.createChart(pDiv, {
+    layout:{background:{color:'#0d1117'},textColor:'#787b86',fontSize:10},
+    grid:{vertLines:{color:'rgba(255,255,255,.02)'},horzLines:{color:'rgba(255,255,255,.02)'}},
+    rightPriceScale:{borderColor:'#2e3347'},
+    timeScale:{borderColor:'#2e3347',timeVisible:true,visible:false},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
+    handleScroll:{mouseWheel:true}, handleScale:{mouseWheel:true},
+  });
+
+  chart.timeScale().subscribeVisibleLogicalRangeChange(range=>{
+    if(range) pChart.timeScale().setVisibleLogicalRange(range);
+  });
+
+  ind._paneChart = pChart; ind._paneId = pid;
+  ind._paneSeries = {}; ind._paneStaticSeries = [];
+  const n = ind.name;
+
+  const mkLine = (clr,w=2,style=0) => pChart.addLineSeries({color:clr,lineWidth:w,lineStyle:style,priceLineVisible:false,lastValueVisible:true});
+
+  if (n==='MACD') {
+    ind._paneSeries.macd   = mkLine(d.macd_color||'#2196F3');
+    ind._paneSeries.signal = mkLine(d.signal_color||'#FF9800',1,LightweightCharts.LineStyle.Dashed);
+    ind._paneSeries.hist   = pChart.addHistogramSeries({priceLineVisible:false,lastValueVisible:false,base:0});
+  } else if (n==='Stochastic') {
+    ind._paneSeries.k = mkLine(d.k_color||'#2196F3');
+    ind._paneSeries.d = mkLine(d.d_color||'#FF9800',1,LightweightCharts.LineStyle.Dashed);
+    addLevelLines(pChart, ind, [d.upper||80, 50, d.lower||20], ['rgba(239,83,80,.35)','rgba(120,120,120,.25)','rgba(38,166,154,.35)']);
+  } else {
+    ind._paneSeries.main = mkLine(d.color||'#9C27B0');
+    if (d.upper!==undefined) addLevelLines(pChart, ind, [d.upper, 50, d.lower], ['rgba(239,83,80,.35)','rgba(120,120,120,.25)','rgba(38,166,154,.35)']);
+  }
+
+  ind._color = d.color||'#9C27B0';
+  new ResizeObserver(()=>pChart.applyOptions({width:pDiv.clientWidth,height:pDiv.clientHeight})).observe(pDiv);
+}
+
+function addLevelLines(pChart, ind, levels, colors) {
+  const cache = HistoricalStore.get(currentTF);
+  if (!cache?.length) return;
+  const t0=cache[0].unixTime, t1=cache[cache.length-1].unixTime;
+  levels.forEach((lvl,i)=>{
+    if (lvl==null) return;
+    const s = pChart.addLineSeries({color:colors[i],lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    s.setData([{time:t0,value:lvl},{time:t1,value:lvl}]);
+    ind._paneStaticSeries.push(s);
+  });
+}
+
+function renderZoneBasedInd(ind, curTime) {
+  (ind._zonePrims||[]).forEach(p=>{try{cSeries.detachPrimitive(p);}catch(e){}});
+  ind._zonePrims=[];
+  const fd=ind._fullData;
+  if(!fd?.zones) return;
+  const isBull = z => z.type==='bull';
+  fd.zones.filter(z=>{ const t=HistoricalStore.get(currentTF)?.find(c=>c.unixTime>=ist2unix(z.creation_datetime||'2000-01-01')); return t&&t.unixTime<=curTime; }).slice(-30).forEach(z=>{
+    const t1 = ist2unix(z.creation_datetime||'');
+    const t2 = curTime;
+    if(!t1) return;
+    const p = new RectPrimitive(chart,cSeries,t1,z.top,t2,z.bottom,
+      isBull(z)?'rgba(38,166,154,0.13)':'rgba(239,83,80,0.13)',
+      isBull(z)?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)');
+    cSeries.attachPrimitive(p);
+    ind._zonePrims.push(p);
+  });
+}
+
+function removeInd(id) {
+  const ind = IndicatorStore.active.find(a=>a.id===id); if(!ind) return;
+  Object.values(ind._lwcSeries||{}).forEach(s=>{try{chart.removeSeries(s);}catch(e){}});
+  (ind._zonePrims||[]).forEach(p=>{try{cSeries.detachPrimitive(p);}catch(e){}});
+  if(ind._fillPrim){try{cSeries.detachPrimitive(ind._fillPrim);}catch(e){}}
+  if(ind._stLinePrim){try{cSeries.detachPrimitive(ind._stLinePrim);}catch(e){}}
+  if (ind._paneId) removePaneInd(ind._paneId, id);
+  IndicatorStore.active = IndicatorStore.active.filter(a=>a.id!==id);
+  IndicatorStore.clearCache(id);
+  buildLegend(); saveLayout();
+}
+
+function removePaneInd(pid, id) {
+  const ind = IndicatorStore.active.find(a=>a.id===id);
+  if (ind?._paneChart) ind._paneChart.remove();
+  document.getElementById('dom-'+pid)?.remove();
+  IndicatorStore.active = IndicatorStore.active.filter(a=>a.id!==id);
+  buildLegend(); saveLayout();
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 10: SETTINGS, LEGEND, DRAWING TOOLS
+// ───────────────────────────────────────────────────────────────────────────────
+
+let _editId = null;
+
+function openSettings(id) {
+  const ind = IndicatorStore.active.find(a=>a.id===id); if(!ind) return;
+  _editId = id;
+  document.getElementById('set-title').textContent = ind.name + ' — Settings';
+  const form = document.getElementById('set-form'); form.innerHTML='';
+  ind.schema.forEach(f=>{
+    const val = ind.settings[f.key]??f.default;
+    const row = document.createElement('div'); row.className='set-row';
+    let inp='';
+    if (f.type==='select') {
+      inp=`<select class="set-sel" data-key="${f.key}">${(f.options||[]).map(o=>`<option value="${o}"${o==val?' selected':''}>${o}</option>`).join('')}</select>`;
+    } else if (f.type==='color') {
+      inp=`<input type="color" class="set-inp" data-key="${f.key}" value="${val}">`;
+    } else if (f.type==='bool') {
+      inp=`<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" data-key="${f.key}"${val?' checked':''} style="width:15px;height:15px;cursor:pointer"> Enabled</label>`;
+    } else {
+      inp=`<input type="number" class="set-inp" data-key="${f.key}" value="${val}" step="${f.type==='float'?.1:1}" ${f.min!=null?`min="${f.min}"`:''}${f.max!=null?` max="${f.max}"`:''}>`;
+    }
+    row.innerHTML=`<div class="set-lbl">${f.label}</div>${inp}`;
+    form.appendChild(row);
+  });
+  document.getElementById('set-popup').classList.add('open');
+}
+
+async function applySettings() {
+  const ind = IndicatorStore.active.find(a=>a.id===_editId); if(!ind) return;
+  document.querySelectorAll('#set-form [data-key]').forEach(el=>{
+    const f=ind.schema.find(s=>s.key===el.dataset.key); if(!f) return;
+    ind.settings[el.dataset.key] = el.type==='checkbox'?el.checked:(f.type==='int'?parseInt(el.value):(f.type==='float'?parseFloat(el.value):el.value));
+  });
+  closePopup('set-popup');
+  await computeFull(ind);
+  if (ind.overlay) createOverlaySeries(ind);
+  IndicatorEngine.buildCache(ind);
+  IndicatorEngine._renderIndAtCursor(ind, CursorStore.index);
+  buildLegend(); saveLayout(); showToast('✅ '+ind.name+' updated');
+}
+
+function buildLegend() {
+  const el=document.getElementById('legend'); el.innerHTML='';
+  IndicatorStore.active.forEach(ind=>{
+    const d=document.createElement('div'); d.className='leg-item';
+    d.innerHTML=`<div class="leg-dot" style="background:${ind._color||'#888'}"></div>
+      <span>${ind.name}</span>
+      <button class="leg-gear" onclick="openSettings(${ind.id})" title="Settings">⚙</button>
+      <button class="leg-x" onclick="removeInd(${ind.id})" title="Remove">✕</button>`;
+    el.appendChild(d);
+  });
+}
+
+function setTool(tool) {
+  DrawingStore.tool = tool;
+  DrawingStore.state = null;
+  if (DrawingStore.preview) { try{cSeries.detachPrimitive(DrawingStore.preview);}catch(e){} DrawingStore.preview=null; }
+  document.querySelectorAll('.d-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));
+  document.getElementById('lwc').classList.toggle('draw-cursor', tool!=='cursor');
+  if (tool==='hline') showToast('Click on chart to place horizontal line');
+}
+
+function getSnappedPrice(param) {
+  let price = cSeries.coordinateToPrice(param.point?.y);
+  if (price == null) return null;
+  const bar = param.seriesData.get(cSeries);
+  if (bar) {
+    const pts = [bar.open, bar.high, bar.low, bar.close];
+    let closest = pts[0], minD = Math.abs(price - pts[0]);
+    for(let i=1; i<4; i++){
+      const d = Math.abs(price - pts[i]);
+      if(d < minD){ minD = d; closest = pts[i]; }
+    }
+    if (minD < price * 0.003) price = closest;
+  }
+  return price;
+}
+
+function onChartClick(param) {
+  if (DrawingStore.tool==='cursor'||!param.time) return;
+  const price = getSnappedPrice(param);
+  if (price==null) return;
+
+  if (DrawingStore.tool==='hline') {
+    const pl = cSeries.createPriceLine({
+      price, color:'#f59e0b', lineWidth:1,
+      lineStyle:LightweightCharts.LineStyle.Dashed,
+      axisLabelVisible:true, title:`${price.toFixed(2)}`
+    });
+    DrawingStore.items.push({type:'hline', pl});
+    setTool('cursor');
+    showToast('H-Line @ ' + price.toFixed(2));
+    return;
+  }
+
+  if (['trendline','ray','rect','fib'].includes(DrawingStore.tool)) {
+    if (!DrawingStore.state) {
+      DrawingStore.state = {step:1, t1:param.time, p1:price};
+      showToast('Click second point to complete ' + DrawingStore.tool);
+    } else {
+      finalizeDraw(DrawingStore.tool, DrawingStore.state.t1, DrawingStore.state.p1, param.time, price);
+      DrawingStore.state=null;
+      if (DrawingStore.preview){try{cSeries.detachPrimitive(DrawingStore.preview);}catch(e){} DrawingStore.preview=null;}
+      setTool('cursor');
+    }
+  }
+}
+
+function onXhair(param) {
+  if (DrawingStore.state?.step===1 && param.time && DrawingStore.tool!=='cursor') {
+    const pr = getSnappedPrice(param);
+    if (pr!=null) showPreview(DrawingStore.tool, DrawingStore.state.t1, DrawingStore.state.p1, param.time, pr);
+  }
+
+  const tt = document.getElementById('xhair');
+  if (!param.time||!param.seriesData?.size){tt.classList.remove('show');return;}
+  const bar = param.seriesData.get(cSeries);
+  if (!bar){tt.classList.remove('show');return;}
+
+  const c = HistoricalStore.get(currentTF)?.find(c=>c.unixTime===param.time)||bar;
+  const dt = c.datetime||'';
+  const chg = ((bar.close-bar.open)/bar.open*100).toFixed(2);
+  const pos = parseFloat(chg)>=0;
+
+  document.getElementById('xh-date').textContent  = dt.slice(0,10)||'—';
+  document.getElementById('xh-time').textContent  = dt.slice(11,16)||'—';
+  document.getElementById('xh-o').textContent     = bar.open.toFixed(2);
+  document.getElementById('xh-h').textContent     = bar.high.toFixed(2);
+  document.getElementById('xh-l').textContent     = bar.low.toFixed(2);
+  document.getElementById('xh-c').textContent     = bar.close.toFixed(2);
+  const ce = document.getElementById('xh-chg');
+  ce.textContent = (pos?'+':'')+chg+'%';
+  ce.className   = 'xh-val '+(pos?'xh-green':'xh-red');
+  tt.classList.add('show');
+
+  if (_stDebugOn) {
+    const stInd = IndicatorStore.active.find(ind => ind.name === 'SuperTrend');
+    if (stInd?._fullData) {
+      const fd = stInd._fullData;
+      const idx = fd.rawTimes?.findIndex(t => t === param.time);
+      if (idx >= 0) {
+        const dir = fd.rawDir[idx];
+        document.getElementById('st-atr').textContent = (fd.rawATR?.[idx] ?? '—').toString();
+        document.getElementById('st-bub').textContent = (fd.rawBUB?.[idx] ?? '—').toString();
+        document.getElementById('st-blb').textContent = (fd.rawBLB?.[idx] ?? '—').toString();
+        document.getElementById('st-fub').textContent = (fd.rawFUB?.[idx] ?? '—').toString();
+        document.getElementById('st-flb').textContent = (fd.rawFLB?.[idx] ?? '—').toString();
+        document.getElementById('st-dir').textContent = dir === 1 ? 'BULL' : 'BEAR';
+        document.getElementById('st-dir').className = 'xh-val ' + (dir === 1 ? 'xh-green' : 'xh-red');
+        document.getElementById('st-val').textContent = (fd.rawST?.[idx] ?? '—').toString();
+      }
+    }
+  }
+}
+
+function showPreview(tool, t1, p1, t2, p2) {
+  if (DrawingStore.preview){try{cSeries.detachPrimitive(DrawingStore.preview);}catch(e){}}
+  if (tool==='rect')   DrawingStore.preview=new RectPrimitive(chart,cSeries,t1,p1,t2,p2,'rgba(255,235,59,.09)','rgba(255,235,59,.8)');
+  else if(tool==='fib') DrawingStore.preview=new FibPrimitive(chart,cSeries,t1,p1,t2,p2);
+  else if(tool==='trendline') DrawingStore.preview=new LinePrimitive(chart,cSeries,t1,p1,t2,p2,'rgba(245,158,11,.7)',false);
+  else if(tool==='ray')       DrawingStore.preview=new LinePrimitive(chart,cSeries,t1,p1,t2,p2,'rgba(245,158,11,.7)',true);
+  else {DrawingStore.preview=null;return;}
+  cSeries.attachPrimitive(DrawingStore.preview);
+}
+
+function finalizeDraw(tool, t1, p1, t2, p2) {
+  let obj;
+  if (tool==='rect') {
+    obj=new RectPrimitive(chart,cSeries,t1,p1,t2,p2,'rgba(255,235,59,.09)','rgba(255,235,59,.85)');
+    cSeries.attachPrimitive(obj); DrawingStore.items.push({type:'rect',prim:obj});
+  } else if (tool==='fib') {
+    obj=new FibPrimitive(chart,cSeries,t1,p1,t2,p2);
+    cSeries.attachPrimitive(obj); DrawingStore.items.push({type:'fib',prim:obj});
+  } else if (tool==='trendline') {
+    obj=new LinePrimitive(chart,cSeries,t1,p1,t2,p2,'#f59e0b',false);
+    cSeries.attachPrimitive(obj); DrawingStore.items.push({type:'trendline',prim:obj});
+  } else if (tool==='ray') {
+    obj=new LinePrimitive(chart,cSeries,t1,p1,t2,p2,'#f59e0b',true);
+    cSeries.attachPrimitive(obj); DrawingStore.items.push({type:'ray',prim:obj});
+  }
+}
+
+function clearDrawings() {
+  DrawingStore.items.forEach(d=>{
+    try{
+      if(d.pl)   cSeries.removePriceLine(d.pl);
+      if(d.prim) cSeries.detachPrimitive(d.prim);
+      if(d.s)    chart.removeSeries(d.s);
+    }catch(e){}
+  });
+  DrawingStore.items=[];
+  showToast('Drawings cleared');
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 11: TIMEFRAME SWITCHING, ZONES, ST DEBUG
+// ───────────────────────────────────────────────────────────────────────────────
+
+async function switchTF(tf) {
+  if (tf === currentTF) return;
+  replay.pause();
+
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.toggle('active', b.dataset.tf===tf));
+
+  // Zones disabled — no cleanup needed
+
+  // Remove indicator series + pane charts
+  IndicatorStore.active.forEach(ind => {
+    Object.values(ind._lwcSeries||{}).forEach(s => { try { chart.removeSeries(s); } catch(e){} });
+    if(ind._fillPrim){try{cSeries.detachPrimitive(ind._fillPrim);}catch(e){}}
+    if(ind._stLinePrim){try{cSeries.detachPrimitive(ind._stLinePrim);}catch(e){}}
+    if(ind._paneChart){ try{ ind._paneChart.remove(); }catch(e){} ind._paneChart=null; }
+    if(ind._paneId){ document.getElementById('dom-'+ind._paneId)?.remove(); }
+    ind._lwcSeries = {};
+    ind._fullData = null;
+    ind._paneSeries = {};
+    ind._paneStaticSeries = [];
+    IndicatorStore.clearCache(ind.id);
+  });
+
+  currentTF = tf;
+  showToast('Loading ' + tf + '…');
+  await preload(tf, _replayRange.start, _replayRange.end);
+  CursorStore.set(Math.min(CursorStore.index, HistoricalStore.length - 1));
+
+  // Rebuild everything for new TF
+  for (const ind of IndicatorStore.active) {
+    await computeFull(ind);
+    if (ind.overlay) createOverlaySeries(ind);
+    IndicatorEngine.buildCache(ind);
+  }
+
+  ChartEngine.seek();
+  // ZoneEngine.tick();
+  IndicatorEngine.seek();
+  UIController.update();
+  fitChart();
+  showToast('✅ ' + tf);
+  saveLayout();
+}
+
+function toggleZones() {
+  showZones = !showZones;
+  document.getElementById('zone-btn').style.opacity = showZones ? '1' : '0.35';
+  ZoneStore.getPrimitives().forEach(p => {
+    if (showZones) p.prim.show();
+    else p.prim.hide();
+  });
+  chart.applyOptions({});
+  saveLayout();
+}
+
+let showZones = false;
+
+function toggleSTDebug() {
+  _stDebugOn = !_stDebugOn;
+  const btn = document.getElementById('st-debug-btn');
+  const panel = document.getElementById('st-debug');
+  if (_stDebugOn) {
+    btn.classList.add('on');
+    panel.classList.add('show');
+  } else {
+    btn.classList.remove('on');
+    panel.classList.remove('show');
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// SECTION 12: UTILITIES, LAYOUT, KEYBOARD
+// ───────────────────────────────────────────────────────────────────────────────
+
+function ist2unix(dtStr) {
+  if(!dtStr||dtStr==='Active'||dtStr==='Never Touched') return 0;
+  return Math.floor(new Date(dtStr.replace(' ','T')+'Z').getTime()/1000);
+}
+
+function fitChart()  { 
+  ViewportStore.autoScroll = true;
+  chart.timeScale().fitContent(); 
+}
+
+function jumpToDate(dateStr) {
+  const cache = HistoricalStore.get(currentTF); if(!cache) return;
+  const target = new Date(dateStr+'T00:00:00Z').getTime()/1000;
+  let idx = cache.findIndex(c=>c.unixTime>=target);
+  if(idx<0) idx=cache.length-1;
+  replay.scrubTo(idx);
+  fitChart();
+  showToast('Jumped to '+dateStr+' — bar #'+idx);
+}
+
+function takeScreenshot() {
+  const cnv=chart.takeScreenshot();
+  const a=document.createElement('a');
+  a.href=cnv.toDataURL(); a.download=`NIFTY_${currentTF}_${Date.now()}.png`; a.click();
+}
+
+function openMonthly() { window.open('file:///f:/Exit time option/techinal imbalance python/monthly_charts/monthly_charts_index.html','_blank'); }
+function openIndLib()  { document.getElementById('ind-popup').classList.add('open'); setTimeout(()=>document.getElementById('ind-search').focus(),50); }
+function closePopup(id){ document.getElementById(id).classList.remove('open'); }
+
+let _toastT=null;
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(_toastT); _toastT=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+const LS='nifty_v5';
+function saveLayout() {
+  try { localStorage.setItem(LS, JSON.stringify({
+    tf:currentTF, idx:CursorStore.index,
+    indicators:IndicatorStore.active.map(a=>({name:a.name,settings:a.settings})),
+  })); } catch(e){}
+}
+
+async function restoreLayout() {
+  let s; try{s=JSON.parse(localStorage.getItem(LS)||'null');}catch(e){}
+  if(!s) return;
+  if(s.tf&&s.tf!==currentTF){ currentTF=s.tf; document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('active',b.dataset.tf===currentTF)); await preload(currentTF); }
+  if(s.idx!==undefined) CursorStore.set(s.idx);
+  // showZones disabled
+  if(s.indicators){
+    for(const sv of s.indicators){
+      const meta=IndicatorStore.registry.find(r=>r.name===sv.name); if(!meta) continue;
+      const id=++IndicatorStore._nextId; const settings={};
+      meta.schema.forEach(f=>settings[f.key]=f.default);
+      Object.assign(settings,sv.settings);
+      const ind={id,name:sv.name,settings,overlay:meta.overlay,pane:meta.pane,schema:meta.schema,_lwcSeries:{},_paneSeries:{},_paneStaticSeries:[]};
+      IndicatorStore.active.push(ind);
+      await computeFull(ind);
+      if(ind.overlay) createOverlaySeries(ind); else createPaneSeries(ind);
+      IndicatorEngine.buildCache(ind);
+    }
+    buildLegend();
+  }
+  ChartEngine.seek();
+  // ZoneEngine.tick();
+  IndicatorEngine.seek();
+  UIController.update();
+}
+
+function bindKeys() {
+  document.addEventListener('keydown', e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+    switch(e.key){
+      case ' ':         e.preventDefault(); replay.togglePlay();    break;
+      case 'ArrowRight':replay.stepFwd();                           break;
+      case 'ArrowLeft': replay.stepBack();                          break;
+      case 'Home':      replay.reset();                             break;
+      case 'End':       replay.goEnd();                             break;
+      case 'f':case 'F':fitChart();                                 break;
+      case 'i':case 'I':openIndLib();                               break;
+      case 'h':case 'H':setTool('hline');                           break;
+      case 'g':case 'G':setTool('rect');                            break;
+      case 'b':case 'B':setTool('fib');                             break;
+      case 't':case 'T':setTool('trendline');                       break;
+      case 'r':case 'R':setTool('ray');                             break;
+      case 'v':case 'V':setTool('cursor');                          break;
+      case 'Escape':    setTool('cursor'); closePopup('ind-popup'); closePopup('set-popup'); break;
+    }
+  });
+}
+
+document.querySelectorAll('.overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('active',b.dataset.tf===currentTF));
+// Expose replay object to window for inline onclick handlers
+window.replay = replay;
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  await init();
+});
+</script>
+</body>
+</html>
