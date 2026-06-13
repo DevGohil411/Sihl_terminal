@@ -592,7 +592,7 @@ function InvestorBuilderBanner() {
                   Start automating without any additional charges
                 </h3>
                 <p className="text-[15px] text-[#94A3B8] leading-relaxed max-w-md mb-7">
-                  Zero API charges and zero brokerage. Connect your algos directly to live market data and execution venues without hidden costs.
+                  Zero API charges and a flat ₹20 per order brokerage. Connect your algos directly to live market data and execution venues without hidden costs.
                 </p>
 
                 {/* brokerage comparison */}
@@ -604,7 +604,7 @@ function InvestorBuilderBanner() {
                   <div className="h-10 w-px bg-white/10" />
                   <div className="flex flex-col">
                     <span className="text-[11px] text-[#64748B] uppercase tracking-wider">Brokerage</span>
-                    <span className="text-2xl font-bold text-[#2DD4BF]">₹0</span>
+                    <span className="text-2xl font-bold text-white">₹20 <span className="text-sm font-medium text-[#64748B]">/ order</span></span>
                   </div>
                 </div>
 
@@ -695,7 +695,7 @@ function InvestorBuilderBanner() {
                     transition={{ duration: 0.5, delay: 0.6 }}
                   >
                     <rect x="288" y="150" width="84" height="24" rx="5" fill={`${TEAL}14`} stroke={TEAL} strokeWidth="0.7" opacity="0.95" />
-                    <text x="330" y="166" textAnchor="middle" fill={TEAL} fontSize="10" fontWeight="700" letterSpacing="0.08em">BROKERAGE</text>
+                    <text x="330" y="166" textAnchor="middle" fill={TEAL} fontSize="10" fontWeight="700" letterSpacing="0.08em">API CHARGES</text>
                   </motion.g>
 
                   {/* Ambient particles */}
