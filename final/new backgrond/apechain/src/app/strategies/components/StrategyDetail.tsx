@@ -66,13 +66,12 @@ export default function StrategyDetailPanel({ strategy, onClose }: { strategy: S
           </div>
 
           {/* Metrics */}
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-4">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mt-4">
             {[
               { label: "Market View", value: strategy.marketView, icon: TrendingUp, color: "#00D4FF" },
               { label: "Risk Level", value: strategy.riskLevel, icon: Shield, color: "#00B4A6" },
               { label: "Reward", value: strategy.rewardPotential, icon: Zap, color: "#C8A456" },
               { label: "Legs", value: strategy.legs.toString(), icon: Layers, color: "#4ECDC4" },
-              { label: "Capital", value: strategy.capitalRequired, icon: Wallet, color: "#FFB300" },
               { label: "Difficulty", value: strategy.difficulty, icon: BookOpen, color: "#00C853" },
             ].map((m) => (
               <div key={m.label} className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
