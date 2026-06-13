@@ -65,60 +65,58 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Center: Institutional navigation — editorial minimal */}
         <nav className="hidden md:flex items-center gap-8">
-          {/* EXPLORE links directly to sihl.in */}
-          <motion.a
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            href="https://sihl.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-[12.5px] tracking-[0.24em] font-semibold transition-all duration-350 relative group block"
-            style={{ color: 'var(--nav-inactive)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--nav-inactive)')}
-          >
-            EXPLORE
-            <span
-              className="absolute bottom-[-4px] left-0 w-0 h-[1px] transition-all duration-350 group-hover:w-full"
-              style={{ background: "var(--accent-gold)", opacity: 0.50 }}
-            />
-          </motion.a>
-
           {[
+            { label: "EXPLORE", href: "https://sihl.in", external: true },
             { label: "BACKTESTS ENGINE", href: "/terminal", pulse: true },
             { label: "REPLAY BAR", href: "/build" },
             { label: "SIMULATOR", href: "/simulator" },
             { label: "STRATEGIES", href: "/strategies" },
-            { label: "API", href: "/api" }
+            { label: "API", href: "/api" },
           ].map((item, i) => (
             <motion.div
               key={item.label}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
+              transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
             >
-              <Link
-                href={item.href}
-                className="font-mono text-[11.5px] tracking-[0.20em] font-medium transition-all duration-300 relative group flex items-center gap-1.5"
-                style={{ color: 'var(--nav-inactive)', letterSpacing: '0.18em' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--nav-inactive)')}
-              >
-              {item.pulse && (
-                <span
-                  className="w-[5px] h-[5px] rounded-full animate-pulse"
-                  style={{ backgroundColor: 'var(--positive)', boxShadow: '0 0 5px rgba(78,158,114,0.35)' }}
-                />
+              {item.external ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[11.5px] tracking-[0.20em] font-medium transition-all duration-300 relative group flex items-center gap-1.5"
+                  style={{ color: 'var(--nav-inactive)', letterSpacing: '0.18em' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--nav-inactive)')}
+                >
+                  {item.label}
+                  <span
+                    className="absolute bottom-[-4px] left-0 w-0 h-[1px] transition-all duration-350 group-hover:w-full"
+                    style={{ background: "var(--accent-gold)", opacity: 0.50 }}
+                  />
+                </a>
+              ) : (
+                <Link
+                  href={item.href}
+                  className="font-mono text-[11.5px] tracking-[0.20em] font-medium transition-all duration-300 relative group flex items-center gap-1.5"
+                  style={{ color: 'var(--nav-inactive)', letterSpacing: '0.18em' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--nav-inactive)')}
+                >
+                  {item.pulse && (
+                    <span
+                      className="w-[5px] h-[5px] rounded-full animate-pulse"
+                      style={{ backgroundColor: 'var(--positive)', boxShadow: '0 0 5px rgba(78,158,114,0.35)' }}
+                    />
+                  )}
+                  {item.label}
+                  <span
+                    className="absolute bottom-[-4px] left-0 w-0 h-[1px] transition-all duration-350 group-hover:w-full"
+                    style={{ background: item.pulse ? "var(--positive)" : "var(--accent-gold)", opacity: 0.50 }}
+                  />
+                </Link>
               )}
-              {item.label}
-              <span
-                className="absolute bottom-[-4px] left-0 w-0 h-[1px] transition-all duration-350 group-hover:w-full"
-                style={{ background: item.pulse ? "var(--positive)" : "var(--accent-gold)", opacity: 0.50 }}
-              />
-              </Link>
             </motion.div>
           ))}
         </nav>
