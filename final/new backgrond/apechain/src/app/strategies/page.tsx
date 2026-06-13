@@ -873,7 +873,7 @@ const API_CARDS = [
   {
     num: "02",
     icon: Workflow,
-    title: "Automate Without the Plumbing",
+    title: "Automate Without the Complexity",
     desc: "We handle authentication, session management, rate limits, and error retrying so you can focus on strategy logic instead of API maintenance.",
     color: BLUE,
   },
@@ -1083,6 +1083,7 @@ const PLAN_INCLUDES = [
   "Simulator Data available since 1st Jan'19",
   "Nifty, Banknifty, Finnifty, Midcpnifty",
   "F&O Stocks only available in No Code Strategy",
+  "In Replay Bar you get all time frame, multiple indicator support, multiple symbol and more 25000+ candle in all TF",
 ];
 
 const PLAN_EXCLUDES = [
