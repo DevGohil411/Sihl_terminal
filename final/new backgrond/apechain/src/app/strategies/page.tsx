@@ -1086,10 +1086,7 @@ const PLAN_INCLUDES = [
   "In Replay Bar you get all time frame, multiple indicator support, multiple symbol and more 25000+ candle in all TF",
 ];
 
-const PLAN_EXCLUDES = [
-  "F&O Stocks only available in No Code Strategy, not in Simulator",
-  "Not applicable for Auto Backtesting on Home & Basket Page",
-];
+const PLAN_EXCLUDES = [];
 
 function StrategyPlans() {
   const ref = useRef(null);
