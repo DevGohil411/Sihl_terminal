@@ -67,12 +67,12 @@ export default function Navbar() {
 
         <nav className="hidden md:flex items-center gap-8">
           {[
-            { label: "EXPLORE", href: "https://sihl.in", external: true },
+            { label: "STRATEGIES", href: "/strategies" },
             { label: "BACKTESTS ENGINE", href: "/terminal", pulse: true },
             { label: "REPLAY BAR", href: "/build" },
             { label: "SIMULATOR", href: "/simulator" },
-            { label: "STRATEGIES", href: "/strategies" },
             { label: "API", href: "/api" },
+            { label: "EXPLORE", href: "https://sihl.in", external: true },
           ].map((item, i) => (
             <motion.div
               key={item.label}
