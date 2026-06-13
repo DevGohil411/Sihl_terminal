@@ -1082,10 +1082,11 @@ const PLAN_INCLUDES = [
   "Get Access to Simulator, Builder, Replay Bar, Backtest Strategy Analysis",
   "Simulator Data available since 1st Jan'19",
   "Nifty, Banknifty, Finnifty, Midcpnifty",
+  "F&O Stocks only available in No Code Strategy",
 ];
 
 const PLAN_EXCLUDES = [
-  "F&O Stocks only available in Builder, not in Simulator",
+  "F&O Stocks only available in No Code Strategy, not in Simulator",
   "Not applicable for Auto Backtesting on Home & Basket Page",
 ];
 
