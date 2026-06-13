@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { BarChart3 } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -15,6 +16,21 @@ import { generatePayoffData } from "../data";
 import type { StrategyLeg } from "../data";
 
 export default function PayoffChart({ legs }: { legs: StrategyLeg[] }) {
+  if (legs.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-card">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Payoff Chart</h3>
+        <div className="h-80 min-h-[320px] flex flex-col items-center justify-center text-center rounded-xl border border-dashed border-gray-200 bg-slate-50/50">
+          <BarChart3 size={40} className="text-gray-300 mb-3" />
+          <p className="text-sm font-semibold text-slate-700">No legs added yet</p>
+          <p className="text-xs text-slate-500 mt-1 max-w-[240px]">
+            Add positions above to visualize the strategy payoff diagram.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const data = generatePayoffData(legs);
   const currentPrice = 22500;
 
@@ -44,7 +60,7 @@ export default function PayoffChart({ legs }: { legs: StrategyLeg[] }) {
         </div>
       </div>
 
-      <div className="w-full h-80">
+      <div className="w-full h-80 min-h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
             <defs>

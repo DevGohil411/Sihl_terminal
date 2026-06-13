@@ -66,7 +66,7 @@ export default function Navbar() {
         </Link>
 
         {/* Center: Institutional navigation — editorial minimal */}
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-8">
           {/* EXPLORE links directly to sihl.in */}
           <motion.a
             initial={{ opacity: 0, y: -10 }}
@@ -124,6 +124,22 @@ export default function Navbar() {
         </nav>
 
 
+        {/* Desktop auth buttons */}
+        <div className="hidden md:flex items-center gap-3 pl-5 border-l border-white/10">
+          <Link
+            href="/login"
+            className="text-[13px] font-medium text-white/70 hover:text-white transition-colors"
+          >
+            Login
+          </Link>
+          <Link
+            href="/signup"
+            className="px-4 py-2 rounded-lg text-[13px] font-medium text-white/80 border border-white/15 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-300"
+          >
+            Sign Up
+          </Link>
+        </div>
+
         {/* Mobile Hamburger menu */}
         <button
           className="md:hidden relative z-10 text-white p-2 hover:opacity-80 transition-opacity"
@@ -169,6 +185,15 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
+
+          <div className="flex items-center gap-5 mt-6">
+            <Link href="/login" className="text-lg font-medium text-white/60 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+              Login
+            </Link>
+            <Link href="/signup" className="px-6 py-2.5 rounded-lg border border-white/20 text-white/80 font-medium hover:text-white hover:border-white/40 hover:bg-white/5 transition-all" onClick={() => setMobileMenuOpen(false)}>
+              Sign Up
+            </Link>
+          </div>
 
         </div>
       </div>

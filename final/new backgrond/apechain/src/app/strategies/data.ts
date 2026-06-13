@@ -31,7 +31,7 @@ export const PRE_BUILT_STRATEGIES: StrategyDetail[] = [
     difficulty: "Beginner",
     legs: 2,
     description:
-      "A limited-risk bullish strategy created by buying a call option and simultaneously selling a higher strike call option. Profits from moderate upside movement while capping both risk and reward.",
+      "A defined-risk bullish strategy created by buying a call option and simultaneously selling a higher strike call. Ideal when expecting a moderate upward move while limiting capital outlay.",
     howItWorks: [
       "Buy ATM Call Option (Lower Strike)",
       "Sell Higher Strike OTM Call Option",
@@ -78,7 +78,7 @@ export const PRE_BUILT_STRATEGIES: StrategyDetail[] = [
     difficulty: "Beginner",
     legs: 2,
     description:
-      "A limited-risk bearish strategy using two put options. Buy an ATM put and sell a lower strike put to reduce cost and define risk.",
+      "A limited-risk bearish strategy using two put options. Buy a higher strike put and sell a lower strike put to reduce premium cost while maintaining downside exposure.",
     howItWorks: [
       "Buy ATM Put Option (Higher Strike)",
       "Sell Lower Strike OTM Put Option",
@@ -124,7 +124,7 @@ export const PRE_BUILT_STRATEGIES: StrategyDetail[] = [
     difficulty: "Advanced",
     legs: 4,
     description:
-      "A four-leg income strategy designed to profit when the market remains within a range. Combines a bull put spread and a bear call spread.",
+      "A premium collection strategy designed for range-bound markets. Combines a bull put spread and bear call spread to profit when price remains inside a defined range.",
     howItWorks: [
       "Sell OTM Call (Upper breakeven)",
       "Buy Further OTM Call (Protection)",
@@ -171,7 +171,7 @@ export const PRE_BUILT_STRATEGIES: StrategyDetail[] = [
     difficulty: "Advanced",
     legs: 4,
     description:
-      "A premium-selling strategy that profits when price remains near a specific strike. Higher profit potential than Iron Condor but narrower profitable range.",
+      "An advanced income strategy that generates profit when the underlying stays near the center strike at expiry. Offers higher reward potential with tighter risk boundaries.",
     howItWorks: [
       "Sell ATM Call (Same strike as ATM Put)",
       "Buy OTM Call (Protection)",
@@ -198,304 +198,111 @@ export const PRE_BUILT_STRATEGIES: StrategyDetail[] = [
     ],
     maxProfit: "Net credit received",
     maxLoss: "Difference between strikes minus net credit",
-    breakeven: "ATM Strike ± Net Credit",
+    breakeven: "Short Call Strike + Credit OR Short Put Strike - Credit",
     exampleTrade: [
-      "Sell NIFTY 25000 CE @ ₹200",
-      "Buy NIFTY 25200 CE @ ₹80",
-      "Sell NIFTY 25000 PE @ ₹180",
-      "Buy NIFTY 24800 PE @ ₹60",
-      "Net Credit = ₹240 per lot",
+      "Sell NIFTY 25000 CE @ ₹150",
+      "Buy NIFTY 25200 CE @ ₹50",
+      "Sell NIFTY 25000 PE @ ₹150",
+      "Buy NIFTY 24800 PE @ ₹50",
+      "Net Credit = ₹200 per lot",
     ],
   },
   {
-    id: "long-straddle",
-    name: "Long Straddle",
-    category: "Volatility",
-    marketView: "High Volatility Expected",
-    riskLevel: "High",
-    rewardPotential: "Unlimited",
-    capitalRequired: "₹95,000",
-    difficulty: "Intermediate",
-    legs: 2,
-    description:
-      "A volatility strategy that profits from a large move in either direction. Buy both ATM call and put to benefit from volatility expansion.",
-    howItWorks: [
-      "Buy ATM Call Option",
-      "Buy ATM Put Option (Same strike, same expiry)",
-      "Requires large move in either direction",
-      "Profits from volatility expansion",
-      "Unlimited upside if market moves strongly",
-    ],
-    advantages: [
-      "Unlimited profit potential on both sides",
-      "Profits from volatility expansion",
-      "No need to predict direction",
-      "Best for event-driven trading",
-    ],
-    disadvantages: [
-      "High premium cost (paying for both call and put)",
-      "Time decay hurts both positions",
-      "Requires significant move to break even",
-      "Loss if market stays flat",
-    ],
-    bestConditions: [
-      "Before major events (budget, earnings, RBI policy)",
-      "Results season with expected large moves",
-      "High uncertainty periods",
-      "When implied volatility is low (cheaper entry)",
-    ],
-    maxProfit: "Unlimited in both directions",
-    maxLoss: "Total premium paid for both options",
-    breakeven: "ATM Strike ± Total Premium Paid",
-    exampleTrade: [
-      "Buy NIFTY 25000 CE @ ₹250",
-      "Buy NIFTY 25000 PE @ ₹280",
-      "Total Premium = ₹530 per lot",
-      "Breakeven: 24470 and 25530",
-    ],
-  },
-  {
-    id: "short-straddle",
-    name: "Short Straddle",
+    id: "jade-lizard",
+    name: "Jade Lizard",
     category: "Income",
-    marketView: "Low Volatility Expected",
-    riskLevel: "Very High",
+    marketView: "Moderately Bullish",
+    riskLevel: "High",
     rewardPotential: "Limited",
-    capitalRequired: "₹1,50,000",
-    difficulty: "Expert",
-    legs: 2,
+    capitalRequired: "₹75,000",
+    difficulty: "Advanced",
+    legs: 3,
     description:
-      "Premium collection strategy designed to profit when market remains near ATM strike. Sell both call and put at the same strike.",
+      "A premium-selling options strategy combining a short put with a short call spread. Designed to generate income while maintaining no upside risk beyond the call spread width.",
     howItWorks: [
-      "Sell ATM Call Option",
-      "Sell ATM Put Option (Same strike)",
-      "Collect premium from both legs",
-      "Profit if market stays near strike",
-      "Maximum profit at exact ATM price at expiry",
+      "Sell OTM Put",
+      "Sell OTM Call",
+      "Buy Higher Strike OTM Call",
+      "Collect Net Credit",
+      "Profit if price stays above short put",
     ],
     advantages: [
-      "Maximum profit if market stays flat",
-      "Time decay works very strongly in your favor",
-      "High probability when market is range-bound",
-      "Collect premium from both sides",
+      "Generates premium income",
+      "No upside risk beyond spread width",
+      "High probability setup",
+      "Beneficial in bullish-to-neutral markets",
     ],
     disadvantages: [
-      "Unlimited risk on both sides",
-      "Requires high margin",
-      "Dangerous if market moves sharply",
-      "Needs constant monitoring",
+      "Downside risk remains",
+      "Requires margin",
+      "Assignment risk exists",
     ],
     bestConditions: [
-      "Extremely low volatility expected",
-      "Range-bound market for extended period",
-      "After major events when volatility collapses",
-      "Experienced traders only",
+      "Moderately bullish to neutral outlook",
+      "Low to moderate volatility",
+      "Confident price will stay above short put strike",
+      "Income-focused traders comfortable with margin",
     ],
-    maxProfit: "Total premium received",
-    maxLoss: "Unlimited in both directions",
-    breakeven: "ATM Strike ± Total Premium Received",
+    maxProfit: "Net credit received",
+    maxLoss: "Difference between put strikes minus net credit",
+    breakeven: "Short Put Strike - Net Credit Received",
     exampleTrade: [
-      "Sell NIFTY 25000 CE @ ₹250",
-      "Sell NIFTY 25000 PE @ ₹280",
-      "Total Credit = ₹530 per lot",
-      "Breakeven: 24470 and 25530",
+      "Sell NIFTY 24800 PE @ ₹90",
+      "Sell NIFTY 25200 CE @ ₹80",
+      "Buy NIFTY 25400 CE @ ₹30",
+      "Net Credit = ₹140 per lot",
     ],
   },
   {
-    id: "long-strangle",
-    name: "Long Strangle",
+    id: "batman-strategy",
+    name: "Batman Strategy",
     category: "Volatility",
     marketView: "Volatility Expansion",
-    riskLevel: "Moderate",
-    rewardPotential: "Unlimited",
-    capitalRequired: "₹65,000",
-    difficulty: "Intermediate",
-    legs: 2,
+    riskLevel: "High",
+    rewardPotential: "Substantial",
+    capitalRequired: "₹90,000",
+    difficulty: "Advanced",
+    legs: 4,
     description:
-      "Cheaper alternative to long straddle using OTM options. Buy OTM call and OTM put to profit from large moves with lower cost.",
+      "A multi-leg options structure designed to benefit from sharp directional movement and volatility expansion. Commonly used when large market moves are expected around events.",
     howItWorks: [
-      "Buy OTM Call Option (Higher Strike)",
-      "Buy OTM Put Option (Lower Strike)",
-      "Cheaper than straddle due to OTM strikes",
-      "Needs larger move than straddle to profit",
-      "Unlimited profit potential",
+      "Buy Wing Options",
+      "Sell Inner Options",
+      "Construct Symmetrical Risk Profile",
+      "Benefit from strong price movement",
+      "Defined risk structure",
     ],
     advantages: [
-      "Lower cost than long straddle",
-      "Unlimited profit potential",
-      "No directional bias needed",
-      "Better for budget-conscious traders",
+      "Defined maximum risk",
+      "Benefits from volatility expansion",
+      "Suitable for event-driven trades",
+      "Attractive risk/reward profile",
     ],
     disadvantages: [
-      "Needs larger move to break even",
-      "Time decay on both positions",
-      "Lower probability of profit than straddle",
-      "Wider breakeven points",
+      "Time decay impact",
+      "Requires significant movement",
+      "More complex than basic spreads",
     ],
     bestConditions: [
-      "Expecting large move but unsure of direction",
-      "Before major events with limited budget",
-      "When OTM options are relatively cheap",
-      "High volatility expected",
+      "Expected large move around events or earnings",
+      "Implied volatility expected to rise",
+      "Directional bias uncertain but move size expected",
+      "Experienced options traders",
     ],
-    maxProfit: "Unlimited in both directions",
-    maxLoss: "Total premium paid",
-    breakeven: "Call Strike + Premium and Put Strike - Premium",
+    maxProfit: "Limited but high when price moves sharply beyond breakevens",
+    maxLoss: "Net debit or defined risk at center strike",
+    breakeven: "Upper and lower strikes adjusted by net credit/debit",
     exampleTrade: [
-      "Buy NIFTY 25200 CE @ ₹120",
-      "Buy NIFTY 24800 PE @ ₹100",
-      "Total Premium = ₹220 per lot",
-      "Breakeven: 24580 and 25420",
-    ],
-  },
-  {
-    id: "short-strangle",
-    name: "Short Strangle",
-    category: "Income",
-    marketView: "Neutral",
-    riskLevel: "Very High",
-    rewardPotential: "Limited",
-    capitalRequired: "₹1,20,000",
-    difficulty: "Expert",
-    legs: 2,
-    description:
-      "Premium-selling strategy that benefits from low volatility. Sell OTM call and OTM put to collect premium from a wider range.",
-    howItWorks: [
-      "Sell OTM Call Option",
-      "Sell OTM Put Option",
-      "Wider profitable range than short straddle",
-      "Collect premium from both sides",
-      "Profit if market stays between two strikes",
-    ],
-    advantages: [
-      "Wider profit zone than short straddle",
-      "Lower margin requirement than straddle",
-      "Time decay benefits both positions",
-      "High probability strategy when range-bound",
-    ],
-    disadvantages: [
-      "Unlimited risk on both sides",
-      "Lower premium collection than straddle",
-      "Needs significant margin",
-      "Dangerous in trending markets",
-    ],
-    bestConditions: [
-      "Range-bound market with wide range",
-      "Low volatility environment",
-      "When you expect market to stay between two levels",
-      "For experienced premium sellers",
-    ],
-    maxProfit: "Total premium received",
-    maxLoss: "Unlimited beyond breakevens",
-    breakeven: "Call Strike + Credit and Put Strike - Credit",
-    exampleTrade: [
-      "Sell NIFTY 25200 CE @ ₹120",
-      "Sell NIFTY 24800 PE @ ₹100",
-      "Total Credit = ₹220 per lot",
-      "Profit Zone: 24580 to 25420",
-    ],
-  },
-  {
-    id: "covered-call",
-    name: "Covered Call",
-    category: "Income",
-    marketView: "Mildly Bullish",
-    riskLevel: "Low",
-    rewardPotential: "Limited",
-    capitalRequired: "₹2,50,000",
-    difficulty: "Beginner",
-    legs: 2,
-    description:
-      "Income-generating strategy where a call option is sold against owned stock or futures. Generates regular income from premiums.",
-    howItWorks: [
-      "Own the underlying stock/futures (Long position)",
-      "Sell OTM Call Option against holding",
-      "Collect premium from call sale",
-      "If price stays below strike, keep premium",
-      "If price goes above, shares are called away",
-    ],
-    advantages: [
-      "Generates regular income from premiums",
-      "Reduces cost basis of holding",
-      "Limited downside protection (premium amount)",
-      "Ideal for sideways to mildly bullish markets",
-    ],
-    disadvantages: [
-      "Caps upside potential above strike",
-      "Still exposed to large downside moves",
-      "Requires owning underlying asset",
-      "Early assignment risk",
-    ],
-    bestConditions: [
-      "Own stock and expect sideways movement",
-      "Mildly bullish but not strongly",
-      "Before expiry for theta decay benefit",
-      "When implied volatility is high (better premiums)",
-    ],
-    maxProfit: "Strike - Purchase Price + Premium Received",
-    maxLoss: "Purchase Price - Premium Received (unlimited downside)",
-    breakeven: "Purchase Price - Premium Received",
-    exampleTrade: [
-      "Buy NIFTY Futures @ 25000",
-      "Sell NIFTY 25200 CE @ ₹150",
-      "Premium Income = ₹150",
-      "If NIFTY closes below 25200, keep full premium",
-    ],
-  },
-  {
-    id: "protective-put",
-    name: "Protective Put",
-    category: "Protection",
-    marketView: "Bullish With Protection",
-    riskLevel: "Low",
-    rewardPotential: "Unlimited",
-    capitalRequired: "₹2,60,000",
-    difficulty: "Beginner",
-    legs: 2,
-    description:
-      "Insurance strategy used to protect stock holdings against downside risk. Buy a put option while holding the underlying.",
-    howItWorks: [
-      "Own the underlying stock/futures",
-      "Buy ATM or slightly OTM Put Option",
-      "Put acts as insurance against downside",
-      "If market falls, put gains offset stock losses",
-      "If market rises, only lose premium paid",
-    ],
-    advantages: [
-      "Complete downside protection below strike",
-      "Unlimited upside potential maintained",
-      "Peace of mind during volatile periods",
-      "Like insurance for your portfolio",
-    ],
-    disadvantages: [
-      "Premium cost reduces overall returns",
-      "Continuous cost if rolled monthly",
-      "Time decay on put option",
-      "Protection is temporary (expiry-based)",
-    ],
-    bestConditions: [
-      "Bullish but worried about short-term correction",
-      "Before major events or earnings",
-      "High volatility periods when protection is needed",
-      "Long-term holders wanting temporary insurance",
-    ],
-    maxProfit: "Unlimited (stock upside minus premium)",
-    maxLoss: "Stock Purchase Price - Put Strike + Premium",
-    breakeven: "Stock Purchase Price + Premium Paid",
-    exampleTrade: [
-      "Buy NIFTY Futures @ 25000",
-      "Buy NIFTY 24800 PE @ ₹200",
-      "Maximum Loss = ₹400 per lot",
-      "Protection kicks in below 24800",
+      "Buy NIFTY 24800 PE @ ₹40",
+      "Sell 2x NIFTY 25000 PE @ ₹90",
+      "Buy NIFTY 25200 CE @ ₹40",
+      "Sell 2x NIFTY 25000 CE @ ₹90",
+      "Net Credit = ₹100 per set",
     ],
   },
 ];
 
-export function getStrategyById(id: string): StrategyDetail | undefined {
-  return PRE_BUILT_STRATEGIES.find((s) => s.id === id);
-}
-
-export function searchStrategies(query: string): StrategyDetail[] {
+export function searchStrategies(query: string) {
   const q = query.toLowerCase();
   return PRE_BUILT_STRATEGIES.filter(
     (s) =>
@@ -536,23 +343,22 @@ export function generateStrategyPayoff(strategyId: string) {
           Math.max(0, 24800 - spot) +
           240;
         break;
-      case "long-straddle":
-        payoff = Math.max(0, spot - 25000) + Math.max(0, 25000 - spot) - 530;
+      case "jade-lizard":
+        payoff =
+          140 -
+          Math.max(0, 24800 - spot) -
+          Math.max(0, spot - 25200) +
+          Math.max(0, spot - 25400);
         break;
-      case "short-straddle":
-        payoff = 530 - Math.max(0, spot - 25000) - Math.max(0, 25000 - spot);
-        break;
-      case "long-strangle":
-        payoff = Math.max(0, spot - 25200) + Math.max(0, 24800 - spot) - 220;
-        break;
-      case "short-strangle":
-        payoff = 220 - Math.max(0, spot - 25200) - Math.max(0, 24800 - spot);
-        break;
-      case "covered-call":
-        payoff = Math.min(spot - 25000, 200) + 150;
-        break;
-      case "protective-put":
-        payoff = spot - 25000 + Math.max(0, 24800 - spot) - 200;
+      case "batman-strategy":
+        payoff =
+          Math.max(0, spot - 25200) -
+          2 * Math.max(0, spot - 25000) +
+          Math.max(0, spot - 24800) +
+          Math.max(0, 24800 - spot) -
+          2 * Math.max(0, 25000 - spot) +
+          Math.max(0, 25200 - spot) +
+          150;
         break;
       default:
         payoff = 0;

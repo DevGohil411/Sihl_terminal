@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, Minus, Shield, Zap, Wallet, Layers, CheckCircle2, AlertTriangle, BookOpen, Lightbulb, BarChart3, ArrowRight } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from "recharts";
@@ -189,26 +190,55 @@ export default function StrategyDetailPanel({ strategy, onClose }: { strategy: S
               )}
 
               {activeTab === "payoff" && (
-                <div>
-                  <h3 className="text-sm font-semibold text-white mb-4">Payoff Diagram</h3>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={payoffData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="profitGradDetail" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#00C853" stopOpacity={0.2} />
-                            <stop offset="95%" stopColor="#00C853" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="spot" tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => v.toLocaleString("en-IN")} stroke="rgba(255,255,255,0.1)" />
-                        <YAxis tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}K`} stroke="rgba(255,255,255,0.1)" />
-                        <Tooltip contentStyle={{ backgroundColor: "#0F1A2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "12px", color: "#E8ECF1" }} formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Payoff"]} labelFormatter={(label: any) => `Spot: ${Number(label).toLocaleString("en-IN")}`} />
-                        <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="3 3" />
-                        <ReferenceLine x={22500} stroke="#00D4FF" strokeDasharray="4 4" label={{ value: "Current", position: "top", fill: "#00D4FF", fontSize: 10 }} />
-                        <Area type="monotone" dataKey="payoff" stroke="#00D4FF" strokeWidth={2} fill="url(#profitGradDetail)" fillOpacity={1} />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                      <div className="text-[10px] text-[#5A6680] uppercase tracking-wider mb-1">Max Profit</div>
+                      <div className="text-sm font-semibold text-[#00C853]">{strategy.maxProfit}</div>
+                    </div>
+                    <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                      <div className="text-[10px] text-[#5A6680] uppercase tracking-wider mb-1">Max Loss</div>
+                      <div className="text-sm font-semibold text-[#FF5252]">{strategy.maxLoss}</div>
+                    </div>
+                    <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                      <div className="text-[10px] text-[#5A6680] uppercase tracking-wider mb-1">Breakeven</div>
+                      <div className="text-sm font-semibold text-[#00D4FF]">{strategy.breakeven}</div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                      <h3 className="text-sm font-semibold text-white">Payoff Diagram</h3>
+                      <div className="flex items-center gap-4 text-[11px]">
+                        <div className="flex items-center gap-1.5 text-[#8A95A8]">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-[#00D4FF]" />
+                          Payoff
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[#8A95A8]">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-white/20" />
+                          Current Spot
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-80 min-h-[320px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={payoffData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="profitGradDetail" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#00C853" stopOpacity={0.25} />
+                              <stop offset="95%" stopColor="#00C853" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                          <XAxis dataKey="spot" tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => v.toLocaleString("en-IN")} stroke="rgba(255,255,255,0.1)" />
+                          <YAxis tick={{ fontSize: 11, fill: "#5A6680" }} tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}K`} stroke="rgba(255,255,255,0.1)" />
+                          <Tooltip contentStyle={{ backgroundColor: "#0F1A2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "12px", color: "#E8ECF1" }} formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Payoff"]} labelFormatter={(label: any) => `Spot: ${Number(label).toLocaleString("en-IN")}`} />
+                          <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="3 3" />
+                          <ReferenceLine x={22500} stroke="#00D4FF" strokeDasharray="4 4" label={{ value: "Current", position: "top", fill: "#00D4FF", fontSize: 10 }} />
+                          <Area type="monotone" dataKey="payoff" stroke="#00D4FF" strokeWidth={2} fill="url(#profitGradDetail)" fillOpacity={1} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
               )}
@@ -218,10 +248,13 @@ export default function StrategyDetailPanel({ strategy, onClose }: { strategy: S
 
         {/* Footer */}
         <div className="p-4 border-t border-white/[0.06] flex justify-end">
-          <button className="px-6 py-2.5 rounded-lg text-sm font-semibold text-[#0B1120] bg-gradient-to-r from-[#00D4FF] to-[#00B4A6] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition-all duration-300 flex items-center gap-2">
+          <Link
+            href={`/strategy-builder?strategy=${encodeURIComponent(strategy.name)}`}
+            className="px-6 py-2.5 rounded-lg text-sm font-semibold text-[#0B1120] bg-gradient-to-r from-[#00D4FF] to-[#00B4A6] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition-all duration-300 flex items-center gap-2"
+          >
             <Zap size={14} />
             Add To Strategy Builder
-          </button>
+          </Link>
         </div>
       </motion.div>
     </motion.div>

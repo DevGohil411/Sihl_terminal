@@ -58,7 +58,7 @@ export function UploadPhase() {
           className="text-[42px] leading-tight font-semibold mb-4"
           style={{ color: TOKENS.t0, fontFamily: TYPOGRAPHY.display }}
         >
-          QuantLab
+          SIHL
         </h1>
         <p className="text-sm" style={{ color: TOKENS.t2, fontFamily: TYPOGRAPHY.body }}>
           Upload a strategy file to generate an institutional-grade tear sheet

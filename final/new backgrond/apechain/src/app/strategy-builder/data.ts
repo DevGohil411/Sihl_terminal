@@ -38,24 +38,10 @@ export interface StrategyState {
 export const PRE_BUILT_STRATEGIES = [
   "Bull Call Spread",
   "Bear Put Spread",
-  "Bear Call Spread",
-  "Bull Put Spread",
-  "Covered Call",
-  "Long Combo",
-  "Collar",
-  "Protective Call",
-  "Long Straddle",
-  "Short Straddle",
-  "Strangle",
-  "Short Strangle",
-  "Long Call Butterfly",
-  "Long Call Calendar Spread",
-  "Bull Call Ladder",
-  "Bear Put Ladder",
-  "Bull Ratio Spread",
-  "Bear Ratio Spread",
   "Iron Condor",
   "Iron Butterfly",
+  "Jade Lizard",
+  "Batman Strategy",
 ];
 
 export const SAVED_STRATEGIES = [
@@ -142,9 +128,20 @@ export function generateMockLegsForStrategy(strategyName: string): StrategyLeg[]
         makeLeg({ action: "SELL", segment: "PE", strike: "ATM", value: "ATM", lots: 1 }),
       ];
     case "Strangle":
+    case "Long Strangle":
       return [
         makeLeg({ action: "BUY", segment: "CE", strike: "OTM", value: "OTM 5", lots: 1 }),
         makeLeg({ action: "BUY", segment: "PE", strike: "OTM", value: "OTM 5", lots: 1 }),
+      ];
+    case "Short Strangle":
+      return [
+        makeLeg({ action: "SELL", segment: "CE", strike: "OTM", value: "OTM 5", lots: 1 }),
+        makeLeg({ action: "SELL", segment: "PE", strike: "OTM", value: "OTM 5", lots: 1 }),
+      ];
+    case "Protective Put":
+      return [
+        makeLeg({ action: "BUY", segment: "FUTURES", strike: "ATM Futures", value: "ATM", lots: 1 }),
+        makeLeg({ action: "BUY", segment: "PE", strike: "ATM", value: "ATM", lots: 1 }),
       ];
     case "Iron Condor":
       return [
@@ -159,6 +156,19 @@ export function generateMockLegsForStrategy(strategyName: string): StrategyLeg[]
         makeLeg({ action: "BUY", segment: "CE", strike: "OTM", value: "OTM 3", lots: 1 }),
         makeLeg({ action: "SELL", segment: "PE", strike: "ATM", value: "ATM", lots: 1 }),
         makeLeg({ action: "BUY", segment: "PE", strike: "OTM", value: "OTM 3", lots: 1 }),
+      ];
+    case "Jade Lizard":
+      return [
+        makeLeg({ action: "SELL", segment: "PE", strike: "OTM", value: "OTM 2", lots: 1 }),
+        makeLeg({ action: "SELL", segment: "CE", strike: "OTM", value: "OTM 2", lots: 1 }),
+        makeLeg({ action: "BUY", segment: "CE", strike: "OTM", value: "OTM 5", lots: 1 }),
+      ];
+    case "Batman Strategy":
+      return [
+        makeLeg({ action: "BUY", segment: "CE", strike: "OTM", value: "OTM 5", lots: 1 }),
+        makeLeg({ action: "SELL", segment: "CE", strike: "OTM", value: "OTM 3", lots: 2 }),
+        makeLeg({ action: "BUY", segment: "PE", strike: "OTM", value: "OTM 5", lots: 1 }),
+        makeLeg({ action: "SELL", segment: "PE", strike: "OTM", value: "OTM 3", lots: 2 }),
       ];
     default:
       return [makeLeg({})];

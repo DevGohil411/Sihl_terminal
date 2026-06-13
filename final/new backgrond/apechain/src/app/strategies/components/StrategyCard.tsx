@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus, Shield, Zap, Wallet, Layers } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Shield, Layers } from "lucide-react";
 import type { StrategyDetail } from "../data";
 
 const VIEW_ICONS: Record<string, React.ReactNode> = {
@@ -18,13 +18,27 @@ const RISK_COLORS: Record<string, string> = {
   "Very High": "bg-[#FF5252]/20 text-[#FF5252] border-[#FF5252]/30",
 };
 
+const BIAS_COLORS: Record<string, string> = {
+  Bullish: "bg-[#00C853]/10 text-[#00C853] border-[#00C853]/20",
+  Bearish: "bg-[#FF5252]/10 text-[#FF5252] border-[#FF5252]/20",
+  Neutral: "bg-[#FFB300]/10 text-[#FFB300] border-[#FFB300]/20",
+};
+
 function getViewIcon(marketView: string) {
   return Object.entries(VIEW_ICONS).find(([k]) => marketView.toLowerCase().includes(k.toLowerCase()))?.[1] || VIEW_ICONS.Neutral;
 }
 
+function getBiasKey(marketView: string) {
+  if (marketView.toLowerCase().includes("bullish")) return "Bullish";
+  if (marketView.toLowerCase().includes("bearish")) return "Bearish";
+  return "Neutral";
+}
+
 export default function StrategyCard({ strategy, index, onClick }: { strategy: StrategyDetail; index: number; onClick: () => void }) {
   const viewIcon = getViewIcon(strategy.marketView);
+  const biasKey = getBiasKey(strategy.marketView);
   const riskClass = RISK_COLORS[strategy.riskLevel] || RISK_COLORS.Moderate;
+  const biasClass = BIAS_COLORS[biasKey] || BIAS_COLORS.Neutral;
 
   return (
     <motion.div
@@ -42,9 +56,12 @@ export default function StrategyCard({ strategy, index, onClick }: { strategy: S
       />
 
       <div className="relative z-10">
-        {/* Top row: category + risk */}
+        {/* Top row: bias + risk */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-[#5A6680]">{strategy.category}</span>
+          <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border ${biasClass}`}>
+            {viewIcon}
+            {strategy.marketView}
+          </span>
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${riskClass}`}>{strategy.riskLevel} Risk</span>
         </div>
 
@@ -55,22 +72,11 @@ export default function StrategyCard({ strategy, index, onClick }: { strategy: S
         <p className="text-xs text-[#8A95A8] leading-relaxed mb-5 line-clamp-2">{strategy.description}</p>
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#00D4FF]/10 flex items-center justify-center">{viewIcon}</div>
-            <div><div className="text-[9px] text-[#5A6680] uppercase tracking-wider">View</div><div className="text-xs text-white font-medium">{strategy.marketView}</div></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#00B4A6]/10 flex items-center justify-center"><Layers size={14} className="text-[#00B4A6]" /></div>
-            <div><div className="text-[9px] text-[#5A6680] uppercase tracking-wider">Legs</div><div className="text-xs text-white font-medium">{strategy.legs}</div></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#C8A456]/10 flex items-center justify-center"><Wallet size={14} className="text-[#C8A456]" /></div>
-            <div><div className="text-[9px] text-[#5A6680] uppercase tracking-wider">Capital</div><div className="text-xs text-white font-medium">{strategy.capitalRequired}</div></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#4ECDC4]/10 flex items-center justify-center"><Zap size={14} className="text-[#4ECDC4]" /></div>
-            <div><div className="text-[9px] text-[#5A6680] uppercase tracking-wider">Level</div><div className="text-xs text-white font-medium">{strategy.difficulty}</div></div>
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-7 h-7 rounded-lg bg-[#00B4A6]/10 flex items-center justify-center"><Layers size={14} className="text-[#00B4A6]" /></div>
+          <div>
+            <div className="text-[9px] text-[#5A6680] uppercase tracking-wider">Legs</div>
+            <div className="text-xs text-white font-medium">{strategy.legs}</div>
           </div>
         </div>
 

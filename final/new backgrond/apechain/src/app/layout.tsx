@@ -23,7 +23,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "QuantLab — Institutional Quant Analytics",
+  title: "SIHL — Institutional Quant Analytics",
   description:
     "AI-powered institutional quantitative strategy analysis, backtesting, and risk intelligence platform.",
 };

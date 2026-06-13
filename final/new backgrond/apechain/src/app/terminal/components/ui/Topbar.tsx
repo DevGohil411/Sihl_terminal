@@ -1,6 +1,7 @@
 'use client';
 
-import { PanelLeft, Command, Download, RotateCcw } from 'lucide-react';
+import Link from 'next/link';
+import { PanelLeft, Command, Download, RotateCcw, User } from 'lucide-react';
 import { useTerminalStore } from '../../stores/useTerminalStore';
 import { TOKENS, TYPOGRAPHY } from '../../constants';
 
@@ -36,7 +37,7 @@ export function Topbar() {
           className="text-sm font-semibold tracking-tight"
           style={{ fontFamily: TYPOGRAPHY.display, color: TOKENS.t0 }}
         >
-          QuantLab
+          SIHL
         </span>
         <span className="text-xs" style={{ color: TOKENS.t2 }}>
           / {filename || 'Untitled Strategy'}
@@ -95,6 +96,19 @@ export function Topbar() {
         >
           <RotateCcw size={16} />
         </button>
+
+        <div className="h-4 w-px mx-1" style={{ background: 'rgba(255,255,255,0.10)' }} />
+
+        <Link
+          href="/login"
+          className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded border transition-colors"
+          style={{ borderColor: 'rgba(255,255,255,0.10)', color: TOKENS.t2 }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.10)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+        >
+          <User size={12} />
+          <span className="hidden sm:inline">Login</span>
+        </Link>
       </div>
     </header>
   );
